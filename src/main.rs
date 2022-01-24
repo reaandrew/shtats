@@ -4,13 +4,12 @@ use std::process::{Command, Stdio};
 #[derive(Default, Clone, PartialEq)]
 struct GitCommit {
     commit_hash: String,
-    tags: Vec<String>,
-    author: GitAuthor
+    tags: Vec<String>
 }
 
-fn chomp_commit(line: String, commit: &GitCommit) -> GitCommit {
-    let commit_hash = &line[13..52];
-    let remainder = &line[52..]
+fn chomp_commit(line: &String, commit: &GitCommit) -> GitCommit {
+    let commit_hash = &line[..39];
+    let remainder = &line[39..]
         .replace(&['(', ')'][..], "");
     let tags = remainder
         .split(",")
@@ -28,7 +27,7 @@ fn chomp_commit(line: String, commit: &GitCommit) -> GitCommit {
 fn process(_: &GitCommit, stats: &mut Stats){
     stats.commit_count += 1;
 
-    if stats.commit_count %100 == 0 {
+    if stats.commit_count %1000 == 0 {
         println!("processed {}", stats.commit_count);
     }
 }
@@ -42,7 +41,8 @@ fn main() {
     let args = vec![
         "--no-pager",
         "log",
-        "--pretty=format:commit %w(0,5,5) %H%d%nAuthor: %an <%ae> %nDate: %ad%nSubject: %s%n%b",
+        "-z",
+        "--pretty=format:%ncommit %w(0,0,1) %H%d%nAuthor: %an <%ae> %nDate: %ad%nSubject: %s%b",
         "--tags",
         "--all",
         "--raw",
@@ -62,29 +62,53 @@ fn main() {
         .stdout
         .expect("Could not capture standard output.");
 
-    let reader = BufReader::new(stdout);
+    let mut reader = BufReader::new(stdout);
 
     let mut current: GitCommit = Default::default();
 
-    reader
-        .lines()
-        .filter_map(|x|x.ok())
-        .for_each(|line| {
-            println!("{}", line);
-            match line.chars().collect::<Vec<char>>().as_slice() {
-                ['c', 'o', 'm', 'm', 'i', 't', ..] if current.commit_hash != "" => {
-                    if current != Default::default(){
-                        process(&current, &mut stats);
-                    }
-                    current = Default::default();
-                    current = chomp_commit(line, &current);
-                }
-                &[] => {}
-                &[_, ..] => {}
-            }
-        });
+    let mut s = String::new();
 
-    process(&current, &mut stats);
+    loop{
+        s.clear();
+        let res = reader.read_line(&mut s);
+        if res.is_err() || res.unwrap() == 0 {
+            break;
+        }
+        println!("{}", s);
+        match s.chars().collect::<Vec<char>>().as_slice() {
+            ['c', 'o', 'm', 'm', 'i', 't', ..] => {
+                if current != Default::default(){
+                    process(&current, &mut stats);
+                }
+                current = Default::default();
+                current = chomp_commit(&s, &current);
+            }
+            &[] => {}
+            &[_, ..] => {}
+        }
+    }
+
+    //  U+0000
+    //
+    // reader
+    //     .lines()
+    //     .filter_map(|x|x.ok())
+    //     .for_each(|line| {
+    //         println!("{}", line);
+    //         match line.chars().collect::<Vec<char>>().as_slice() {
+    //             ['c', 'o', 'm', 'm', 'i', 't', ..] if current.commit_hash != "" => {
+    //                 if current != Default::default(){
+    //                     process(&current, &mut stats);
+    //                 }
+    //                 current = Default::default();
+    //                 current = chomp_commit(line, &current);
+    //             }
+    //             &[] => {}
+    //             &[_, ..] => {}
+    //         }
+    //     });
+    //
+    // process(&current, &mut stats);
 
     println!("Commit Count: {}", stats.commit_count);
 }
