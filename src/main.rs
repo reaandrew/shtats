@@ -5,11 +5,11 @@ use std::process::{Command, Stdio};
 struct GitCommit {
     commit_hash: String,
     tags: Vec<String>,
-    Author: String,
-    Date: String,
-    Message: Vec<String>,
-    Files: Vec<String>,
-    Lines: Vec<String>,
+    author: String,
+    date: String,
+    message: Vec<String>,
+    files: Vec<String>,
+    lines: Vec<String>,
 }
 
 fn chomp_commit(line: &String, commit: &mut GitCommit) {
@@ -26,20 +26,43 @@ fn chomp_commit(line: &String, commit: &mut GitCommit) {
     commit.tags = tags;
 }
 
-fn process(commit: &GitCommit, stats: &mut Stats) {
-    stats.commit_count += 1;
-
-    if stats.commit_count % 1000 == 0 {
-        println!("processed {}", stats.commit_count);
+fn process(commit: &GitCommit, stat_functions: &Vec<Box<dyn GitStat>>, stats: &mut GitStats) {
+    println!("LINE: {}", &commit.commit_hash);
+    for stat in stat_functions{
+        stat.process(commit, stats);
     }
 }
 
-#[derive(Default)]
-struct Stats {
-    commit_count: i32,
+trait GitStat {
+    fn process(&self, commit: &GitCommit, stats: &mut GitStats);
+}
+
+struct OverallCommitCount{
+
+}
+
+impl GitStat for OverallCommitCount{
+    fn process(&self, _: &GitCommit, stats: &mut GitStats) {
+        stats.commit_count += 1
+    }
+}
+
+#[derive(Default, Clone, PartialEq, Copy)]
+struct GitStats{
+    commit_count: i32
 }
 
 fn main() {
+    //git rev-list --all --count
+    //
+    //  The above will give you the number of commits first so a progress bar can be displayed.
+
+    let stats_functions: Vec<Box<dyn GitStat>> = vec![
+        Box::new(OverallCommitCount{})
+    ];
+
+    let mut stats: GitStats = Default::default();
+
     let args = vec![
         "--no-pager",
         "log",
@@ -50,8 +73,6 @@ fn main() {
         "--numstat",
         "--date=rfc2822",
     ];
-
-    let mut stats: Stats = Default::default();
 
     let stdout = Command::new("git")
         .args(&args)
@@ -73,31 +94,31 @@ fn main() {
         }
         match s.chars().collect::<Vec<char>>().as_slice() {
             ['c', 'o', 'm', 'm', 'i', 't', ..] => {
-                process(&current, &mut stats);
+                process(&current, &stats_functions, &mut stats);
                 current = Default::default();
                 chomp_commit(&s, &mut current);
             }
             ['A', 'u', 't', 'h', 'o', 'r', ..] => {
-                current.Author = s.clone();
+                current.author = s.clone();
             }
             ['D', 'a', 't', 'e', ..] => {
-                current.Date = s.clone();
+                current.date = s.clone();
             }
             [':', ..] => {
-                current.Files.push(s.clone())
+                current.files.push(s.clone())
             }
             [a, ..] if a.is_numeric() => {
-                current.Lines.push(s.clone())
+                current.lines.push(s.clone())
             }
             &[] => {}
             &[_, ..] => {
-                current.Message.push(s.clone())
+                current.message.push(s.clone())
             }
         }
     }
-    process(&current, &mut stats);
+    process(&current, &stats_functions, &mut stats);
 
-    println!("Commit Count: {}", stats.commit_count);
+    println!("Commit Count {}", stats.commit_count);
 }
 
 mod tests {}
