@@ -1,6 +1,7 @@
 use std::io::{BufRead, BufReader, Error};
 use std::path::{Path};
 use std::process::{ChildStdout, Command, Stdio};
+use ramhorns::{Template, Content};
 
 pub struct BufferedOutput {
     data: String,
@@ -15,7 +16,7 @@ impl BufferedOutput {
         self.data = data;
     }
 
-    pub fn to_string(&self) -> String{
+    pub fn to_string(&self) -> String {
         return self.data.clone();
     }
 }
@@ -30,6 +31,7 @@ struct GitCommit {
     file_operations: Vec<String>,
     line_stats: Vec<String>,
 }
+
 
 /// Extracts the commit hash and the tags from the line
 /// TODO: Split into two separate functions
@@ -82,53 +84,79 @@ trait GitStat {
     fn process(&self, commit: &GitCommit, stats: &mut GitStats);
 }
 
-struct OverallCommitCount {}
+struct SummaryStatsCollector {}
 
-impl GitStat for OverallCommitCount {
-    fn process(&self, _: &GitCommit, stats: &mut GitStats) {
-        stats.commit_count += 1
+impl GitStat for SummaryStatsCollector {
+    fn process(&self, commit: &GitCommit, stats: &mut GitStats) {
+        stats.summary.commit_count += 1;
+
+        if stats.summary.date_first_commit.is_empty(){
+            stats.summary.date_first_commit = String::from(&commit.date);
+        }
+
+        if stats.summary.first_committer.is_empty(){
+            stats.summary.first_committer = String::from(&commit.author);
+        }
     }
 }
 
-#[derive(Default, Clone, PartialEq, Copy)]
-struct GitStats {
+#[derive(Content)]
+#[derive(Default, Clone, PartialEq)]
+pub struct SummaryStats{
     commit_count: i32,
+    date_first_commit: String,
+    first_committer: String,
+    total_lines_added: i32,
+    total_lines_deleted: i32,
+    total_files_added: i32,
+    total_files_deleted: i32,
+    total_files_modified: i32,
+    // TODO: Add renames
 }
 
-trait Reporter{
-    fn write(&self, output: &mut BufferedOutput,  stats: GitStats) ;
+#[derive(Content)]
+#[derive(Default, Clone, PartialEq)]
+pub struct GitStats {
+    summary: SummaryStats,
 }
 
-struct HtmlReporter{
-
+pub trait Reporter {
+    fn write(&self, output: &mut BufferedOutput, stats: GitStats);
 }
 
-impl Reporter for HtmlReporter{
-    fn write(&self, output: &mut BufferedOutput,  stats: GitStats) {
-        output.write(format!("<div>Count Count: {}</div>", stats.commit_count))
+pub struct HtmlReporter {
+    template: String,
+}
+
+impl Reporter for HtmlReporter {
+    fn write(&self, output: &mut BufferedOutput, stats: GitStats) {
+        let tpl = Template::new(&self.template).unwrap();
+
+        let rendered = tpl.render(&stats);
+
+        output.write(rendered);
     }
 }
 
 impl HtmlReporter {
     pub fn new() -> Self {
-        HtmlReporter {}
+        let report_template = include_str!("includes/report.html");
+        HtmlReporter {
+            template: report_template.into()
+        }
     }
 }
 
-
-pub fn run_forora(path: &Path, output: &mut BufferedOutput) -> Result<(), Error> {
-    println!("{}", path.to_str().unwrap());
-
+pub fn run_forora(path: &Path, output: &mut BufferedOutput, reporter: Box<Reporter>) -> Result<(), Error> {
     let stats_functions = create_stat_functions();
     let mut stats: GitStats = Default::default();
     let args = create_git_log_args();
     let stdout = execute_git(&args, path);
 
     process_git_log(&stats_functions, &mut stats, stdout);
-    output.write(format!("Count Count: {}", stats.commit_count));
+    reporter.write(output, stats);
     Ok(())
 }
-
 
 fn process_git_log(stats_functions: &Vec<Box<dyn GitStat>>, mut stats: &mut GitStats, stdout: ChildStdout) {
     let mut reader = BufReader::new(stdout);
@@ -197,7 +225,7 @@ fn create_git_log_args() -> Vec<&'static str> {
 
 fn create_stat_functions() -> Vec<Box<dyn GitStat>> {
     let stats_functions: Vec<Box<dyn GitStat>> = vec![
-        Box::new(OverallCommitCount {})
+        Box::new(SummaryStatsCollector {})
     ];
     stats_functions
 }

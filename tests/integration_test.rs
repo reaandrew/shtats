@@ -1,13 +1,17 @@
-use forora::BufferedOutput;
+use forora::{BufferedOutput, HtmlReporter, Reporter};
 
 mod common;
 
 #[test]
 fn test_cli_report() {
-    common::setup_git_repo(|path|{
+    common::setup_git_repo(|path| {
         let mut output = BufferedOutput::new();
-        forora::run_forora(path, &mut output)?;
-        assert_eq!("Count Count: 4", output.to_string());
+        let reporter = HtmlReporter::new();
+        forora::run_forora(path, &mut output, Box::new(reporter))?;
+        assert!(output.to_string().contains("    <tr>
+        <td>Number of commits</td>
+        <td>4</td>
+    </tr>"));
 
         Ok(())
     }).expect("fail");

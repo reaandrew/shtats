@@ -1,5 +1,5 @@
 use std::path::Path;
-use forora::{BufferedOutput, run_forora};
+use forora::{BufferedOutput, HtmlReporter, Reporter, run_forora};
 
 fn main() {
     //git rev-list --all --count
@@ -7,7 +7,8 @@ fn main() {
     //  The above will give you the number of commits first so a progress bar can be displayed.
 
     let mut output = BufferedOutput::new();
-    match run_forora(Path::new("."), &mut output){
+    let reporter = HtmlReporter::new();
+    match run_forora(Path::new("."), &mut output, Box::new(reporter)){
         Ok(_) => {
             println!("{}", output.to_string())
         }
