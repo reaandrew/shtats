@@ -1,8 +1,10 @@
-# something-something-git-stats
+# shtats
 
-A tool to generate a report showing statistics for a git repository.
+A tool to generate a report showing statistics for git.
 
-For Linux, Mac and Windows
+## Platforms
+
+Linux, Mac and Windows
 
 ## Credits
 
