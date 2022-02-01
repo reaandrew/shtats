@@ -1,13 +1,16 @@
 use std::path::Path;
-use forora::run_forora;
+use forora::{BufferedOutput, run_forora};
 
 fn main() {
     //git rev-list --all --count
     //
     //  The above will give you the number of commits first so a progress bar can be displayed.
 
-    match run_forora(Path::new(".")){
-        Ok(_) => {}
+    let mut output = BufferedOutput::new();
+    match run_forora(Path::new("."), &mut output){
+        Ok(_) => {
+            println!("{}", output.to_string())
+        }
         Err(_) => {
             println!("something went wrong");
         }
