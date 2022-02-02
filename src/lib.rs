@@ -269,11 +269,12 @@ fn create_stat_functions() -> Vec<Box<dyn GitStat>> {
 
 #[cfg(test)]
 mod chomp_tests {
+    use chrono::{DateTime};
     use crate::{chomp_author, chomp_commit, chomp_date, chomp_file_operation, chomp_line_stats, chomp_message, GitCommit};
 
     #[test]
     fn test_chomp_commit() {
-        let mut commit: GitCommit = Default::default();
+        let mut commit: GitCommit = GitCommit::default();
         let line = "commit aa7072f9497aa607f2381ec7a1d5f1f638ed57ae (HEAD -> main, origin/main)";
         chomp_commit(&String::from(line), &mut commit);
         assert_eq!("aa7072f9497aa607f2381ec7a1d5f1f638ed57ae", commit.commit_hash);
@@ -281,7 +282,7 @@ mod chomp_tests {
 
     #[test]
     fn test_chomp_commit_parses_tags() {
-        let mut commit: GitCommit = Default::default();
+        let mut commit: GitCommit = GitCommit::default();
         let line = "commit 87f0e98024ff172c8836ec082e6993ad46865e64 (tag: v0.1.0)";
         chomp_commit(&String::from(line), &mut commit);
         assert_eq!(1, commit.tags.len());
@@ -290,7 +291,7 @@ mod chomp_tests {
 
     #[test]
     fn test_chomp_author() {
-        let mut commit: GitCommit = Default::default();
+        let mut commit: GitCommit = GitCommit::default();
         let line = "Author: Andy Rea <test@does-not-exist.com>";
         chomp_author(&String::from(line), &mut commit);
         assert_eq!("Andy Rea <test@does-not-exist.com>", commit.author);
@@ -298,15 +299,15 @@ mod chomp_tests {
 
     #[test]
     fn test_chomp_date() {
-        let mut commit: GitCommit = Default::default();
-        let line = "Date:   Fri Jan 21 13:29:22 2022 +0000";
+        let mut commit: GitCommit = GitCommit::default();
+        let line = "Date:   Wed, 2 Feb 2022 12:02:17 +0000";
         chomp_date(&String::from(line), &mut commit);
-        assert_eq!("Fri Jan 21 13:29:22 2022 +0000", commit.date);
+        assert_eq!(DateTime::parse_from_rfc2822("Wed, 2 Feb 2022 12:02:17 +0000").unwrap(), commit.date);
     }
 
     #[test]
     fn test_chomp_filestats() {
-        let mut commit: GitCommit = Default::default();
+        let mut commit: GitCommit = GitCommit::default();
         let lines = vec![
             ":000000 100644 0000000 5ebc4f7 A        .github/workflows/rust.yml",
             ":000000 100644 0000000 ea8c4bf A        .gitignore",
@@ -326,7 +327,7 @@ mod chomp_tests {
 
     #[test]
     fn test_chomp_line_stats() {
-        let mut commit: GitCommit = Default::default();
+        let mut commit: GitCommit = GitCommit::default();
         let lines = vec![
             "142     0       .github/workflows/rust.yml",
             "1       0       .gitignore",
@@ -342,7 +343,7 @@ mod chomp_tests {
 
     #[test]
     fn test_chomp_message() {
-        let mut commit: GitCommit = Default::default();
+        let mut commit: GitCommit = GitCommit::default();
         let lines = vec![
             "    This is a massive commit:",
             "    ",
@@ -362,21 +363,21 @@ mod chomp_tests {
 
 #[cfg(test)]
 mod stat_tests {
-    use crate::{GitCommit, GitStat, GitStats, OverallCommitCount, process_commit};
+    use crate::{GitCommit, GitStat, GitStats, process_commit, SummaryStatsCollector};
 
     #[test]
     fn test_overall_commit_count_with_1_commit() {
-        let mut commit: GitCommit = Default::default();
+        let mut commit: GitCommit = GitCommit::default();
         commit.commit_hash = String::from("123");
 
         let stat_functions: Vec<Box<dyn GitStat>> = vec![
-            Box::new(OverallCommitCount {})
+            Box::new(SummaryStatsCollector {})
         ];
 
         let mut stats: GitStats = Default::default();
 
         process_commit(&commit, &stat_functions, &mut stats);
 
-        assert_eq!(1, stats.commit_count);
+        assert_eq!(1, stats.summary.commit_count);
     }
 }

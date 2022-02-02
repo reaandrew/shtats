@@ -10,7 +10,7 @@ fn test_cli_report() {
         forora::run_forora(path, &mut output, Box::new(reporter))?;
         assert!(output.to_string().contains("<tr>
                     <td>Number of commits</td>
-                    <td>4</td>
+                    <td>3</td>
                 </tr>"));
 
         Ok(())
