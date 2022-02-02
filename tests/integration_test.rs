@@ -3,6 +3,7 @@ use forora::{BufferedOutput, HtmlReporter};
 mod common;
 
 #[test]
+#[ignore]
 fn test_cli_report() {
     common::setup_git_repo(|path| {
         let mut output = BufferedOutput::new();
