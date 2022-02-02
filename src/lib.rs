@@ -1,7 +1,12 @@
+mod viewmodel;
+
+use std::collections::HashMap;
 use std::io::{BufRead, BufReader, Error};
 use std::path::{Path};
 use std::process::{ChildStdout, Command, Stdio};
 use ramhorns::{Template, Content};
+use chrono::{DateTime, FixedOffset, Utc};
+use viewmodel::{GitStatsViewModel};
 
 pub struct BufferedOutput {
     data: String,
@@ -21,15 +26,33 @@ impl BufferedOutput {
     }
 }
 
-#[derive(Default, Clone, PartialEq)]
+#[derive(Clone, PartialEq)]
 struct GitCommit {
     commit_hash: String,
     tags: Vec<String>,
     author: String,
-    date: String,
+    date: DateTime<FixedOffset>,
     message: Vec<String>,
     file_operations: Vec<String>,
     line_stats: Vec<String>,
+}
+
+impl GitCommit{
+    fn default() -> Self{
+        return GitCommit{
+            commit_hash: "".to_string(),
+            tags: vec![],
+            author: "".to_string(),
+            date: DateTime::from(Utc::now()),
+            message: vec![],
+            file_operations: vec![],
+            line_stats: vec![]
+        };
+    }
+
+    fn day_key(&self) -> String{
+        return self.date.format("%Y-%m-%d").to_string();
+    }
 }
 
 
@@ -56,7 +79,9 @@ fn chomp_author(line: &String, commit: &mut GitCommit) {
 
 /// Extracts the date from the line
 fn chomp_date(line: &String, commit: &mut GitCommit) {
-    commit.date = String::from(&line[8..]);
+
+    let rfc2822 = DateTime::parse_from_rfc2822(&line[8..].trim()).unwrap();
+    commit.date = rfc2822;
 }
 
 /// Extracts the file operation for the specified file. e.g. Added, Modified, Deleted, Renamed
@@ -90,8 +115,12 @@ impl GitStat for SummaryStatsCollector {
     fn process(&self, commit: &GitCommit, stats: &mut GitStats) {
         stats.summary.commit_count += 1;
 
+        let stat = stats.total_commits_by_day.entry(commit.day_key())
+            .or_insert(0);
+        *stat += 1;
+
         if stats.summary.date_first_commit.is_empty(){
-            stats.summary.date_first_commit = String::from(&commit.date);
+            stats.summary.date_first_commit = commit.date.to_string();
         }
 
         if stats.summary.first_committer.is_empty(){
@@ -114,14 +143,15 @@ pub struct SummaryStats{
     // TODO: Add renames
 }
 
-#[derive(Content)]
+
 #[derive(Default, Clone, PartialEq)]
 pub struct GitStats {
     summary: SummaryStats,
+    total_commits_by_day: HashMap<String,i32>
 }
 
 pub trait Reporter {
-    fn write(&self, output: &mut BufferedOutput, stats: GitStats);
+    fn write(&self, output: &mut BufferedOutput, stats: GitStatsViewModel);
 }
 
 pub struct HtmlReporter {
@@ -129,7 +159,7 @@ pub struct HtmlReporter {
 }
 
 impl Reporter for HtmlReporter {
-    fn write(&self, output: &mut BufferedOutput, stats: GitStats) {
+    fn write(&self, output: &mut BufferedOutput, stats: GitStatsViewModel) {
         let tpl = Template::new(&self.template).unwrap();
 
         let rendered = tpl.render(&stats);
@@ -147,22 +177,24 @@ impl HtmlReporter {
     }
 }
 
-pub fn run_forora(path: &Path, output: &mut BufferedOutput, reporter: Box<Reporter>) -> Result<(), Error> {
+pub fn run_forora(path: &Path, output: &mut BufferedOutput, reporter: Box<dyn Reporter>) -> Result<(), Error> {
     let stats_functions = create_stat_functions();
     let mut stats: GitStats = Default::default();
     let args = create_git_log_args();
     let stdout = execute_git(&args, path);
 
     process_git_log(&stats_functions, &mut stats, stdout);
-    reporter.write(output, stats);
+
+    let viewmodel = GitStatsViewModel::new(&stats.clone());
+    reporter.write(output, viewmodel);
     Ok(())
 }
 
 fn process_git_log(stats_functions: &Vec<Box<dyn GitStat>>, mut stats: &mut GitStats, stdout: ChildStdout) {
     let mut reader = BufReader::new(stdout);
-    let mut current: GitCommit = Default::default();
+    let mut current: GitCommit = GitCommit::default();
     let mut s = String::new();
-
+    let mut start = true;
     loop {
         s.clear();
         let res = reader.read_line(&mut s);
@@ -172,8 +204,12 @@ fn process_git_log(stats_functions: &Vec<Box<dyn GitStat>>, mut stats: &mut GitS
         match s.chars().collect::<Vec<char>>().as_slice() {
             ['c', 'o', 'm', 'm', 'i', 't', ..] => {
                 // TODO: Remove the first call when there is no commit to process
-                process_commit(&current, &stats_functions, &mut stats);
-                current = Default::default();
+                if start{
+                    start = false;
+                }else {
+                    process_commit(&current, &stats_functions, &mut stats);
+                }
+                current = GitCommit::default();
                 chomp_commit(&s, &mut current);
             }
             ['A', 'u', 't', 'h', 'o', 'r', ..] => {
@@ -216,6 +252,7 @@ fn create_git_log_args() -> Vec<&'static str> {
         "--all",
         "--raw",
         "--decorate",
+        "--date-order",
         "--reverse",
         "--numstat",
         "--date=rfc2822",

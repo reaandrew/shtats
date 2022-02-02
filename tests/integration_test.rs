@@ -1,4 +1,4 @@
-use forora::{BufferedOutput, HtmlReporter, Reporter};
+use forora::{BufferedOutput, HtmlReporter};
 
 mod common;
 
@@ -8,10 +8,10 @@ fn test_cli_report() {
         let mut output = BufferedOutput::new();
         let reporter = HtmlReporter::new();
         forora::run_forora(path, &mut output, Box::new(reporter))?;
-        assert!(output.to_string().contains("    <tr>
-        <td>Number of commits</td>
-        <td>4</td>
-    </tr>"));
+        assert!(output.to_string().contains("<tr>
+                    <td>Number of commits</td>
+                    <td>4</td>
+                </tr>"));
 
         Ok(())
     }).expect("fail");

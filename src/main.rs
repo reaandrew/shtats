@@ -1,5 +1,5 @@
 use std::path::Path;
-use forora::{BufferedOutput, HtmlReporter, Reporter, run_forora};
+use forora::{BufferedOutput, HtmlReporter, run_forora};
 
 fn main() {
     //git rev-list --all --count
