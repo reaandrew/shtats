@@ -87,10 +87,15 @@ pub fn setup_git_repo<T>(test_func: T) -> Result<(), Error> where T: Fn(&path::P
         git_init(&path)?;
         create_file(&path)?;
         git_commit(&path, "file 1")?;
+        git_status(&path)?;
+        println!("Committed file 1");
         create_file(&path)?;
         git_commit(&path, "file 2")?;
+        git_status(&path)?;
+        println!("Committed file 2");
         create_file(&path)?;
         git_commit(&path, "file 3")?;
+        println!("Committed file 3");
         git_status(&path)?;
         git_log(&path)?;
         Ok(())
