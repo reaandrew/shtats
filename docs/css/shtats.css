@@ -1,6 +1,12 @@
 html{
     font-family: 'Roboto', sans-serif;
 }
-h1, h2, h3{
+h1{
     font-family: 'Bangers', cursive;
+}
+h2{
+    font-family: 'Shadows Into Light', cursive;
+}
+h3{
+    font-family: 'Passion One', cursive;
 }
