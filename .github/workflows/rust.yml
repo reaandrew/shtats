@@ -57,7 +57,7 @@ jobs:
     needs: test
     runs-on: ${{ matrix.OS }}
     env:
-      NAME: something-something-git-stats
+      NAME: shtats
       TARGET: ${{ matrix.TARGET }}
       OS: ${{ matrix.OS }}
     steps:

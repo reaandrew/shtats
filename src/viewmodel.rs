@@ -47,7 +47,7 @@ impl GitStatsViewModel {
                 value
             })
         }
-        instance.total_commits_by_day.sort_by(|a, b| b.key.cmp(&a.key));
+        instance.total_commits_by_day.sort_by(|a, b| a.key.cmp(&b.key));
 
         return instance;
     }
