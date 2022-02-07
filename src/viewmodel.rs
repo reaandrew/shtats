@@ -1,5 +1,5 @@
 use crate::GitStats;
-use ramhorns::{Template, Content};
+use ramhorns::{Content};
 
 #[derive(Content)]
 struct SummaryViewModel {
