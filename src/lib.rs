@@ -59,6 +59,14 @@ impl GitCommit{
     fn day_key(&self) -> String{
         return self.date.format("%Y-%m-%d").to_string();
     }
+
+    fn total_lines_added(&self) -> i32{
+        return self.line_stats.iter().map(|x|x.lines_added).sum();
+    }
+
+    fn total_lines_deleted(&self) -> i32{
+        return self.line_stats.iter().map(|x|x.lines_deleted).sum();
+    }
 }
 
 
@@ -277,6 +285,26 @@ fn create_stat_functions() -> Vec<Box<dyn GitStat>> {
         Box::new(SummaryStatsCollector {})
     ];
     stats_functions
+}
+
+#[cfg(test)]
+mod commit_tests{
+    use crate::{GitCommit, LineStat};
+
+    #[test]
+    fn test_commit_total_lines_added(){
+        let mut commit = GitCommit::default();
+        commit.line_stats.push(LineStat{
+            lines_added: 1,
+            lines_deleted: 2
+        });
+        commit.line_stats.push(LineStat{
+            lines_added: 4,
+            lines_deleted: 6
+        });
+        assert_eq!(5, commit.total_lines_added());
+        assert_eq!(8, commit.total_lines_deleted());
+    }
 }
 
 #[cfg(test)]
