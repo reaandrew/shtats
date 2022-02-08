@@ -27,6 +27,12 @@ impl BufferedOutput {
 }
 
 #[derive(Clone, PartialEq)]
+struct LineStat{
+    lines_added: i32,
+    lines_deleted: i32
+}
+
+#[derive(Clone, PartialEq)]
 struct GitCommit {
     commit_hash: String,
     tags: Vec<String>,
@@ -34,7 +40,7 @@ struct GitCommit {
     date: DateTime<FixedOffset>,
     message: Vec<String>,
     file_operations: Vec<String>,
-    line_stats: Vec<String>,
+    line_stats: Vec<LineStat>,
 }
 
 impl GitCommit{
@@ -91,7 +97,13 @@ fn chomp_file_operation(line: &String, commit: &mut GitCommit) {
 
 /// Extracts the lines added and lines deleted for the specified file from the line
 fn chomp_line_stats(line: &String, commit: &mut GitCommit) {
-    commit.line_stats.push(String::from(line));
+    let lines_added_raw = &line[0..8];
+    let lines_deleted_raw = &line[8..16];
+
+    commit.line_stats.push(LineStat{
+        lines_added: lines_added_raw.trim().parse().unwrap(),
+        lines_deleted: lines_deleted_raw.trim().parse().unwrap()
+    });
 }
 
 /// Extracts the commit message from the line and pushes into a list on the GitCommit
@@ -330,7 +342,7 @@ mod chomp_tests {
         let mut commit: GitCommit = GitCommit::default();
         let lines = vec![
             "142     0       .github/workflows/rust.yml",
-            "1       0       .gitignore",
+            "1       2123    .gitignore",
             "7       0       Cargo.lock",
         ];
 
@@ -339,6 +351,12 @@ mod chomp_tests {
         }
 
         assert_eq!(3, commit.line_stats.len());
+        assert_eq!(142, commit.line_stats.get(0).unwrap().lines_added);
+        assert_eq!(0, commit.line_stats.get(0).unwrap().lines_deleted);
+        assert_eq!(1, commit.line_stats.get(1).unwrap().lines_added);
+        assert_eq!(2123, commit.line_stats.get(1).unwrap().lines_deleted);
+        assert_eq!(7, commit.line_stats.get(2).unwrap().lines_added);
+        assert_eq!(0, commit.line_stats.get(2).unwrap().lines_deleted);
     }
 
     #[test]
