@@ -32,11 +32,16 @@
         html{
             font-family: 'Roboto', sans-serif;
         }
-        h1, h2, h3{
+        h1{
             font-family: 'Bangers', cursive;
         }
-
-
+        h2{
+            font-family: 'Roboto', sans-serif;
+            font-weight: 800;
+        }
+        h3{
+            font-family: 'Roboto', sans-serif;
+        }
         .chart{
             height:400px;
             width:100%;
@@ -88,18 +93,85 @@
         function bar_simple(element, data) {
            simple_chart(element, data, 'bar')
         }
-
         function line_simple(element, data) {
             simple_chart(element, data, 'line')
         }
 
+        function bar_category(element, categories, data){
+            var chartDom = document.getElementById(element);
+            var myChart = echarts.init(chartDom);
+            var option;
+
+            option = {
+                xAxis: {
+                    type: 'category',
+                    data: categories
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        data: data,
+                        type: 'bar',
+                        showBackground: true,
+                        backgroundStyle: {
+                            color: 'rgba(180, 180, 180, 0.2)'
+                        }
+                    }
+                ]
+            };
+
+            option && myChart.setOption(option);
+        }
+
     </script>
     <script>
+        const month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        const month_names_short=  ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const total_commits_by_day_model = [
             {{#total_commits_by_day}}
                 ["{{key}}",{{value}}],
             {{/total_commits_by_day}}
         ];
+
+        function total_commits_by_weekday_model(){
+            let obj = total_commits_by_day_model.map(x=>[new Date(x[0]).getDay(),x[1]]).reduce((prev,curr) => {
+                if (prev[curr[1]] === undefined){
+                    prev[curr[0]] = curr[1]
+                }else{
+                    prev[curr[0]]+= curr[1]
+                }
+                return prev
+            }, {0:0,1:0,2:0,3:0,4:0,5:0,6:0});
+            return Object.keys(obj).map((key) => [Number(key), obj[key]])
+        };
+
+        function total_commits_by_month_model(){
+            let obj = total_commits_by_day_model.map(x=>[new Date(x[0]).getMonth(),x[1]]).reduce((prev,curr) => {
+                if (prev[curr[1]] === undefined){
+                    prev[curr[0]] = curr[1]
+                }else{
+                    prev[curr[0]]+= curr[1]
+                }
+                return prev
+            }, {});
+            return Object.keys(obj).map((key) => [Number(key), obj[key]]);
+        }
+
+        function total_commits_by_year_model(){
+            let obj = total_commits_by_day_model.map(x=>[new Date(x[0]).getFullYear(),x[1]]).reduce((prev,curr) => {
+                if (prev[curr[1]] === undefined){
+                    prev[curr[0]] = curr[1]
+                }else{
+                    prev[curr[0]]+= curr[1]
+                }
+                return prev
+            }, {});
+            return Object.keys(obj).map((key) => [Number(key), obj[key]]);
+        }
+
+
     </script>
 </head>
 <body>
@@ -138,6 +210,50 @@
             <script>
                 bar_simple("total_commits_by_day", total_commits_by_day_model);
             </script>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <h3>Commit by weekday</h3>
+            <div id="total_commits_by_weekday" class="chart"></div>
+            <script>
+                (function() {
+                    let data = total_commits_by_weekday_model();
+                    let categories = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                    let values = data.map(x => x[1]);
+                    bar_category("total_commits_by_weekday", categories, values);
+                })();
+            </script>
+        </div>
+        <div class="col-4">
+            <h3>Commit by month</h3>
+            <div id="total_commits_by_month" class="chart"></div>
+            <script>
+                (function() {
+                    let data = total_commits_by_month_model();
+                    let sorted_data = [...data].sort((a,b) => a[0]-b[1]);
+                    let categories = sorted_data.map(x => month_names_short[x[0]]);
+                    let values = sorted_data.map(x => x[1]);
+                    bar_category("total_commits_by_month", categories, values);
+                })()
+            </script>
+        </div>
+        <div class="col-4">
+            <h3>Commit by year</h3>
+            <div id="total_commits_by_year" class="chart"></div>
+            <script>
+                (function() {
+                    let data = total_commits_by_year_model();
+                    let sorted_data = [...data].sort((a,b) => a[0]-b[1]);
+                    let categories = sorted_data.map(x => x[0]);
+                    let values = sorted_data.map(x => x[1]);
+                    bar_category("total_commits_by_year", categories, values);
+                })()
+            </script>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
             <h3>Cumulative commits</h3>
             <div id="cumulative_commits_by_day" class="chart"></div>
             <script>
