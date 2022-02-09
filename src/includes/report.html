@@ -56,6 +56,16 @@
                 return pre;
             },[]);
         }
+
+        function rolling_sum_for_lines(data){
+            return data.reduce((pre, cur, index) => {
+                let val = pre[index-1] === undefined ? 0 : pre[index-1][1];
+                console.log('value', val);
+                pre.push([cur[0],(cur[1]-cur[2])+val]);
+                return pre;
+            },[]);
+        }
+
         function lines_added_vs_deleted(element, added, deleted){
             const chartDom = document.getElementById(element);
             const myChart = echarts.init(chartDom);
@@ -119,6 +129,7 @@
                     {
                         data: data,
                         type: type,
+                        step: 'start',
                         showSymbol: false,
                     }
                 ],
@@ -331,6 +342,15 @@
             <div id="lines_added_deleted_by_day" class="chart"></div>
             <script>
                 lines_added_vs_deleted("lines_added_deleted_by_day", lines_added_by_day_model(), lines_deleted_by_day_model());
+            </script>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h3>Cumulative Lines</h3>
+            <div id="cumulative_lines_by_day" class="chart"></div>
+            <script>
+                line_simple("cumulative_lines_by_day", rolling_sum_for_lines(total_lines_by_day_model));
             </script>
         </div>
     </div>
