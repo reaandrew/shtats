@@ -1,3 +1,4 @@
+use bytesize::ByteSize;
 use crate::GitStats;
 use ramhorns::{Content};
 
@@ -37,26 +38,7 @@ impl GitStatsViewModel {
         };
 
 
-        instance.summary.push(SummaryViewModel{
-            name: "First committer".to_string(),
-            value: stats.summary.first_committer.clone()
-        });
-        instance.summary.push(SummaryViewModel{
-            name: "Date of first commit".to_string(),
-            value: stats.summary.date_first_commit.clone()
-        });
-        instance.summary.push(SummaryViewModel{
-            name: "Number of commits".to_string(),
-            value: stats.summary.commit_count.to_string()
-        });
-        instance.summary.push(SummaryViewModel{
-            name: "Total lines added".to_string(),
-            value: stats.summary.total_lines_added.to_string()
-        });
-        instance.summary.push(SummaryViewModel{
-            name: "Total lines deleted".to_string(),
-            value: stats.summary.total_lines_deleted.to_string()
-        });
+        Self::add_summary(stats, &mut instance);
 
         for (key, value) in stats.total_commits_by_day.clone() {
             instance.total_commits_by_day.push(KeyValue{
@@ -76,5 +58,58 @@ impl GitStatsViewModel {
         }
         instance.total_lines_by_day.sort_by(|a, b| a.key.cmp(&b.key));
         return instance;
+    }
+
+    fn add_summary(stats: &GitStats, instance: &mut GitStatsViewModel) {
+        instance.summary.push(SummaryViewModel {
+            name: "First committer".to_string(),
+            value: stats.summary.first_committer.clone()
+        });
+        instance.summary.push(SummaryViewModel {
+            name: "Date of first commit".to_string(),
+            value: stats.summary.date_first_commit.clone()
+        });
+        instance.summary.push(SummaryViewModel {
+            name: "Number of commits".to_string(),
+            value: stats.summary.commit_count.to_string()
+        });
+        instance.summary.push(SummaryViewModel {
+            name: "Total lines added".to_string(),
+            value: stats.summary.total_lines_added.to_string()
+        });
+        instance.summary.push(SummaryViewModel {
+            name: "Total lines deleted".to_string(),
+            value: stats.summary.total_lines_deleted.to_string()
+        });
+
+        instance.summary.push(SummaryViewModel{
+            name: "Max number of lines in a commit message".to_string(),
+            value: stats.message_stats.max_lines.to_string()
+        });
+
+        instance.summary.push(SummaryViewModel{
+            name: "Max size of a commit message".to_string(),
+            value: ByteSize(stats.message_stats.max_size as u64).to_string()
+        });
+
+        instance.summary.push(SummaryViewModel{
+            name: "Avg number of lines in a commit message".to_string(),
+            value: stats.message_stats.avg_lines.to_string()
+        });
+
+        instance.summary.push(SummaryViewModel{
+            name: "Avg size of a commit message".to_string(),
+            value: ByteSize(stats.message_stats.avg_size as u64).to_string()
+        });
+
+        instance.summary.push(SummaryViewModel{
+            name: "Total number of lines across all commit messages".to_string(),
+            value: stats.total_message_lines.to_string()
+        });
+
+        instance.summary.push(SummaryViewModel{
+            name: "Total size of all commit messages".to_string(),
+            value: ByteSize(stats.total_message_size as u64).to_string()
+        });
     }
 }

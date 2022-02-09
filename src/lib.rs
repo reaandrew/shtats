@@ -67,6 +67,14 @@ impl GitCommit {
     fn total_lines_deleted(&self) -> i32 {
         return self.line_stats.iter().map(|x| x.lines_deleted).sum();
     }
+
+    fn total_message_size(&self) -> i32{
+        return self.message.iter().map(|x|x.as_bytes().len() as i32).sum();
+    }
+
+    fn total_message_lines(&self) -> i32{
+        return self.message.len() as i32;
+    }
 }
 
 
@@ -172,6 +180,34 @@ impl GitStat for TotalLinesByDayCollector {
     }
 }
 
+struct MessageStatsCollector{}
+
+impl GitStat for MessageStatsCollector{
+    fn process(&self, commit: &GitCommit, stats: &mut GitStats) {
+        stats.total_message_lines += commit.total_message_lines();
+        stats.total_message_size += commit.total_message_size();
+
+        if commit.total_message_size() > stats.message_stats.max_size{
+            stats.message_stats.max_size = commit.total_message_size()
+        }
+
+        if commit.total_message_lines() > stats.message_stats.max_lines{
+            stats.message_stats.max_lines = commit.total_message_lines();
+        }
+
+        if commit.total_message_size() <= stats.message_stats.min_size {
+            stats.message_stats.min_size = commit.total_message_size()
+        }
+
+        if commit.total_message_lines() <= stats.message_stats.min_lines{
+            stats.message_stats.min_lines = commit.total_message_lines();
+        }
+
+        stats.message_stats.avg_size = stats.total_message_size / stats.summary.commit_count;
+        stats.message_stats.avg_lines = stats.total_message_lines / stats.summary.commit_count
+    }
+}
+
 #[derive(Content)]
 #[derive(Default, Clone, PartialEq)]
 pub struct SummaryStats {
@@ -193,10 +229,23 @@ pub struct LineStats{
 }
 
 #[derive(Default, Clone, PartialEq)]
+pub struct MessageStats{
+    max_size: i32,
+    max_lines: i32,
+    avg_size: i32,
+    avg_lines: i32,
+    min_size: i32,
+    min_lines: i32
+}
+
+#[derive(Default, Clone, PartialEq)]
 pub struct GitStats {
     summary: SummaryStats,
     total_commits_by_day: HashMap<String, i32>,
     total_lines_by_day: HashMap<String, LineStats>,
+    total_message_lines: i32,
+    total_message_size: i32,
+    message_stats: MessageStats
 }
 
 pub trait Reporter {
@@ -314,6 +363,7 @@ fn create_stat_functions() -> Vec<Box<dyn GitStat>> {
         Box::new(SummaryStatsCollector {}),
         Box::new(TotalCommitsByDayCollector {}),
         Box::new(TotalLinesByDayCollector {}),
+        Box::new(MessageStatsCollector{})
     ];
     stats_functions
 }
