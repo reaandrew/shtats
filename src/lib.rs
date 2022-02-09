@@ -27,9 +27,9 @@ impl BufferedOutput {
 }
 
 #[derive(Clone, PartialEq)]
-struct LineStat{
+struct LineStat {
     lines_added: i32,
-    lines_deleted: i32
+    lines_deleted: i32,
 }
 
 #[derive(Clone, PartialEq)]
@@ -43,29 +43,29 @@ struct GitCommit {
     line_stats: Vec<LineStat>,
 }
 
-impl GitCommit{
-    fn default() -> Self{
-        return GitCommit{
+impl GitCommit {
+    fn default() -> Self {
+        return GitCommit {
             commit_hash: "".to_string(),
             tags: vec![],
             author: "".to_string(),
             date: DateTime::from(Utc::now()),
             message: vec![],
             file_operations: vec![],
-            line_stats: vec![]
+            line_stats: vec![],
         };
     }
 
-    fn day_key(&self) -> String{
+    fn day_key(&self) -> String {
         return self.date.format("%Y-%m-%d").to_string();
     }
 
-    fn total_lines_added(&self) -> i32{
-        return self.line_stats.iter().map(|x|x.lines_added).sum();
+    fn total_lines_added(&self) -> i32 {
+        return self.line_stats.iter().map(|x| x.lines_added).sum();
     }
 
-    fn total_lines_deleted(&self) -> i32{
-        return self.line_stats.iter().map(|x|x.lines_deleted).sum();
+    fn total_lines_deleted(&self) -> i32 {
+        return self.line_stats.iter().map(|x| x.lines_deleted).sum();
     }
 }
 
@@ -93,7 +93,6 @@ fn chomp_author(line: &String, commit: &mut GitCommit) {
 
 /// Extracts the date from the line
 fn chomp_date(line: &String, commit: &mut GitCommit) {
-
     let rfc2822 = DateTime::parse_from_rfc2822(&line[8..].trim()).unwrap();
     commit.date = rfc2822;
 }
@@ -105,12 +104,13 @@ fn chomp_file_operation(line: &String, commit: &mut GitCommit) {
 
 /// Extracts the lines added and lines deleted for the specified file from the line
 fn chomp_line_stats(line: &String, commit: &mut GitCommit) {
-    let lines_added_raw = &line[0..8];
-    let lines_deleted_raw = &line[8..16];
+    let mut raw = line.split_whitespace();
+    let lines_added_raw = String::from(raw.next().expect("failed to split lines added"));
+    let lines_deleted_raw = String::from(raw.next().expect("failed to split lines deleted"));
 
-    commit.line_stats.push(LineStat{
-        lines_added: lines_added_raw.trim().parse().unwrap(),
-        lines_deleted: lines_deleted_raw.trim().parse().unwrap()
+    commit.line_stats.push(LineStat {
+        lines_added: lines_added_raw.trim().parse().expect("err parsing lines added"),
+        lines_deleted: lines_deleted_raw.trim().parse().expect("error parsing lines deleted"),
     });
 }
 
@@ -135,23 +135,46 @@ impl GitStat for SummaryStatsCollector {
     fn process(&self, commit: &GitCommit, stats: &mut GitStats) {
         stats.summary.commit_count += 1;
 
-        let stat = stats.total_commits_by_day.entry(commit.day_key())
-            .or_insert(0);
-        *stat += 1;
-
-        if stats.summary.date_first_commit.is_empty(){
+        if stats.summary.date_first_commit.is_empty() {
             stats.summary.date_first_commit = commit.date.to_string();
         }
 
-        if stats.summary.first_committer.is_empty(){
+        if stats.summary.first_committer.is_empty() {
             stats.summary.first_committer = String::from(&commit.author);
         }
+
+        stats.summary.total_lines_added += commit.total_lines_added();
+        stats.summary.total_lines_deleted += commit.total_lines_deleted();
+    }
+}
+
+struct TotalCommitsByDayCollector {}
+
+impl GitStat for TotalCommitsByDayCollector {
+    fn process(&self, commit: &GitCommit, stats: &mut GitStats) {
+        let stat = stats.total_commits_by_day.entry(commit.day_key())
+            .or_insert(0);
+        *stat += 1;
+    }
+}
+
+struct TotalLinesByDayCollector {}
+
+impl GitStat for TotalLinesByDayCollector {
+    fn process(&self, commit: &GitCommit, stats: &mut GitStats) {
+        let stat = stats.total_lines_by_day.entry(commit.day_key())
+            .or_insert(LineStats{
+                added: 0,
+                deleted: 0
+            });
+        stat.added += commit.total_lines_added();
+        stat.deleted += commit.total_lines_deleted();
     }
 }
 
 #[derive(Content)]
 #[derive(Default, Clone, PartialEq)]
-pub struct SummaryStats{
+pub struct SummaryStats {
     commit_count: i32,
     date_first_commit: String,
     first_committer: String,
@@ -163,11 +186,17 @@ pub struct SummaryStats{
     // TODO: Add renames
 }
 
+#[derive(Default, Clone, PartialEq)]
+pub struct LineStats{
+    added: i32,
+    deleted: i32
+}
 
 #[derive(Default, Clone, PartialEq)]
 pub struct GitStats {
     summary: SummaryStats,
-    total_commits_by_day: HashMap<String,i32>
+    total_commits_by_day: HashMap<String, i32>,
+    total_lines_by_day: HashMap<String, LineStats>,
 }
 
 pub trait Reporter {
@@ -224,9 +253,9 @@ fn process_git_log(stats_functions: &Vec<Box<dyn GitStat>>, mut stats: &mut GitS
         match s.chars().collect::<Vec<char>>().as_slice() {
             ['c', 'o', 'm', 'm', 'i', 't', ..] => {
                 // TODO: Remove the first call when there is no commit to process
-                if start{
+                if start {
                     start = false;
-                }else {
+                } else {
                     process_commit(&current, &stats_functions, &mut stats);
                 }
                 current = GitCommit::default();
@@ -282,25 +311,27 @@ fn create_git_log_args() -> Vec<&'static str> {
 
 fn create_stat_functions() -> Vec<Box<dyn GitStat>> {
     let stats_functions: Vec<Box<dyn GitStat>> = vec![
-        Box::new(SummaryStatsCollector {})
+        Box::new(SummaryStatsCollector {}),
+        Box::new(TotalCommitsByDayCollector {}),
+        Box::new(TotalLinesByDayCollector {}),
     ];
     stats_functions
 }
 
 #[cfg(test)]
-mod commit_tests{
+mod commit_tests {
     use crate::{GitCommit, LineStat};
 
     #[test]
-    fn test_commit_total_lines_added(){
+    fn test_commit_total_lines_added() {
         let mut commit = GitCommit::default();
-        commit.line_stats.push(LineStat{
+        commit.line_stats.push(LineStat {
             lines_added: 1,
-            lines_deleted: 2
+            lines_deleted: 2,
         });
-        commit.line_stats.push(LineStat{
+        commit.line_stats.push(LineStat {
             lines_added: 4,
-            lines_deleted: 6
+            lines_deleted: 6,
         });
         assert_eq!(5, commit.total_lines_added());
         assert_eq!(8, commit.total_lines_deleted());
