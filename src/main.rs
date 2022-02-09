@@ -1,5 +1,5 @@
 use std::path::Path;
-use shtats::{BufferedOutput, HtmlReporter, run_forora};
+use shtats::{BufferedOutput, HtmlReporter, run_shtats};
 
 fn main() {
     //git rev-list --all --count
@@ -8,7 +8,7 @@ fn main() {
 
     let mut output = BufferedOutput::new();
     let reporter = HtmlReporter::new();
-    match run_forora(Path::new("."), &mut output, Box::new(reporter)){
+    match run_shtats(Path::new("."), &mut output, Box::new(reporter)){
         Ok(_) => {
             println!("{}", output.to_string())
         }

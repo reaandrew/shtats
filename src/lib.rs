@@ -226,7 +226,7 @@ impl HtmlReporter {
     }
 }
 
-pub fn run_forora(path: &Path, output: &mut BufferedOutput, reporter: Box<dyn Reporter>) -> Result<(), Error> {
+pub fn run_shtats(path: &Path, output: &mut BufferedOutput, reporter: Box<dyn Reporter>) -> Result<(), Error> {
     let stats_functions = create_stat_functions();
     let mut stats: GitStats = Default::default();
     let args = create_git_log_args();
