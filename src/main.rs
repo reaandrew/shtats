@@ -36,7 +36,6 @@ mod tests {
         let mut map: HashMap<u64, i32> = HashMap::new();
 
         for bunch in data {
-            let mut buffer = Vec::<&str>::new();
             let lines = bunch.split("\n").map(|x| x.trim()).collect::<Vec<&str>>();
             let sets = lines.into_iter().powerset().collect::<Vec<_>>();
             for set in sets.iter().filter(|x| x.len() > 1) {

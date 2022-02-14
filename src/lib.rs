@@ -4,9 +4,33 @@ use std::collections::HashMap;
 use std::io::{BufRead, BufReader, Error};
 use std::path::{Path};
 use std::process::{ChildStdout, Command, Stdio};
+use std::str::FromStr;
 use ramhorns::{Template, Content};
 use chrono::{DateTime, FixedOffset, Utc};
 use viewmodel::{GitStatsViewModel};
+
+#[derive(Clone, PartialEq, Debug)]
+#[repr(u8)]
+enum Operation {
+    ADD = b'A',
+    MODIFY = b'M',
+    DELETE = b'D',
+    RENAME = b'R',
+}
+
+impl FromStr for Operation {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Operation, ()> {
+        match s.chars().collect::<Vec<char>>().as_slice() {
+            ['A'] => Ok(Operation::ADD),
+            ['M'] => Ok(Operation::MODIFY),
+            ['D'] => Ok(Operation::DELETE),
+            ['R', ..] => Ok(Operation::RENAME),
+            _ => Err(()),
+        }
+    }
+}
 
 pub struct BufferedOutput {
     data: String,
@@ -33,13 +57,19 @@ struct LineStat {
 }
 
 #[derive(Clone, PartialEq)]
+struct FileOperation {
+    op: Operation,
+    file: String,
+}
+
+#[derive(Clone, PartialEq)]
 struct GitCommit {
     commit_hash: String,
     tags: Vec<String>,
     author: String,
     date: DateTime<FixedOffset>,
     message: Vec<String>,
-    file_operations: Vec<String>,
+    file_operations: Vec<FileOperation>,
     line_stats: Vec<LineStat>,
 }
 
@@ -68,11 +98,11 @@ impl GitCommit {
         return self.line_stats.iter().map(|x| x.lines_deleted).sum();
     }
 
-    fn total_message_size(&self) -> i32{
-        return self.message.iter().map(|x|x.as_bytes().len() as i32).sum();
+    fn total_message_size(&self) -> i32 {
+        return self.message.iter().map(|x| x.as_bytes().len() as i32).sum();
     }
 
-    fn total_message_lines(&self) -> i32{
+    fn total_message_lines(&self) -> i32 {
         return self.message.len() as i32;
     }
 }
@@ -107,7 +137,11 @@ fn chomp_date(line: &String, commit: &mut GitCommit) {
 
 /// Extracts the file operation for the specified file. e.g. Added, Modified, Deleted, Renamed
 fn chomp_file_operation(line: &String, commit: &mut GitCommit) {
-    commit.file_operations.push(String::from(line));
+    let items = line.split_whitespace().collect::<Vec<&str>>();
+    commit.file_operations.push(FileOperation{
+        op: Operation::from_str(items[4]).expect("failed to parse file operation"),
+        file: String::from(items[5]),
+    });
 }
 
 /// Extracts the lines added and lines deleted for the specified file from the line
@@ -171,27 +205,27 @@ struct TotalLinesByDayCollector {}
 impl GitStat for TotalLinesByDayCollector {
     fn process(&self, commit: &GitCommit, stats: &mut GitStats) {
         let stat = stats.total_lines_by_day.entry(commit.day_key())
-            .or_insert(LineStats{
+            .or_insert(LineStats {
                 added: 0,
-                deleted: 0
+                deleted: 0,
             });
         stat.added += commit.total_lines_added();
         stat.deleted += commit.total_lines_deleted();
     }
 }
 
-struct MessageStatsCollector{}
+struct MessageStatsCollector {}
 
-impl GitStat for MessageStatsCollector{
+impl GitStat for MessageStatsCollector {
     fn process(&self, commit: &GitCommit, stats: &mut GitStats) {
         stats.total_message_lines += commit.total_message_lines();
         stats.total_message_size += commit.total_message_size();
 
-        if commit.total_message_size() > stats.message_stats.max_size{
+        if commit.total_message_size() > stats.message_stats.max_size {
             stats.message_stats.max_size = commit.total_message_size()
         }
 
-        if commit.total_message_lines() > stats.message_stats.max_lines{
+        if commit.total_message_lines() > stats.message_stats.max_lines {
             stats.message_stats.max_lines = commit.total_message_lines();
         }
 
@@ -199,7 +233,7 @@ impl GitStat for MessageStatsCollector{
             stats.message_stats.min_size = commit.total_message_size()
         }
 
-        if commit.total_message_lines() <= stats.message_stats.min_lines{
+        if commit.total_message_lines() <= stats.message_stats.min_lines {
             stats.message_stats.min_lines = commit.total_message_lines();
         }
 
@@ -223,19 +257,19 @@ pub struct SummaryStats {
 }
 
 #[derive(Default, Clone, PartialEq)]
-pub struct LineStats{
+pub struct LineStats {
     added: i32,
-    deleted: i32
+    deleted: i32,
 }
 
 #[derive(Default, Clone, PartialEq)]
-pub struct MessageStats{
+pub struct MessageStats {
     max_size: i32,
     max_lines: i32,
     avg_size: i32,
     avg_lines: i32,
     min_size: i32,
-    min_lines: i32
+    min_lines: i32,
 }
 
 #[derive(Default, Clone, PartialEq)]
@@ -245,7 +279,7 @@ pub struct GitStats {
     total_lines_by_day: HashMap<String, LineStats>,
     total_message_lines: i32,
     total_message_size: i32,
-    message_stats: MessageStats
+    message_stats: MessageStats,
 }
 
 pub trait Reporter {
@@ -363,7 +397,7 @@ fn create_stat_functions() -> Vec<Box<dyn GitStat>> {
         Box::new(SummaryStatsCollector {}),
         Box::new(TotalCommitsByDayCollector {}),
         Box::new(TotalLinesByDayCollector {}),
-        Box::new(MessageStatsCollector{})
+        Box::new(MessageStatsCollector {}),
     ];
     stats_functions
 }
@@ -392,6 +426,7 @@ mod commit_tests {
 mod chomp_tests {
     use chrono::{DateTime};
     use crate::{chomp_author, chomp_commit, chomp_date, chomp_file_operation, chomp_line_stats, chomp_message, GitCommit};
+    use crate::Operation::{ADD, DELETE, MODIFY, RENAME};
 
     #[test]
     fn test_chomp_commit() {
@@ -431,9 +466,9 @@ mod chomp_tests {
         let mut commit: GitCommit = GitCommit::default();
         let lines = vec![
             ":000000 100644 0000000 5ebc4f7 A        .github/workflows/rust.yml",
-            ":000000 100644 0000000 ea8c4bf A        .gitignore",
-            ":000000 100644 0000000 696dd88 A        Cargo.lock",
-            ":000000 100644 0000000 94adb32 A        Cargo.toml",
+            ":000000 100644 0000000 ea8c4bf M        .gitignore",
+            ":000000 100644 0000000 696dd88 D        Cargo.lock",
+            ":000000 100644 0000000 94adb32 R100     Cargo.toml",
             ":000000 100644 0000000 3fb8f3d A        LICENSE.md",
             ":000000 100644 0000000 8460aee A        README.md",
             ":000000 100644 0000000 3a5a08a A        src/main.rs",
@@ -444,6 +479,14 @@ mod chomp_tests {
         }
 
         assert_eq!(7, commit.file_operations.len());
+        assert_eq!(ADD, commit.file_operations[0].op);
+        assert_eq!(".github/workflows/rust.yml", commit.file_operations[0].file);
+        assert_eq!(MODIFY, commit.file_operations[1].op);
+        assert_eq!(".gitignore", commit.file_operations[1].file);
+        assert_eq!(DELETE, commit.file_operations[2].op);
+        assert_eq!("Cargo.lock", commit.file_operations[2].file);
+        assert_eq!(RENAME, commit.file_operations[3].op);
+        assert_eq!("Cargo.toml", commit.file_operations[3].file);
     }
 
     #[test]
