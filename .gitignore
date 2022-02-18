@@ -1,3 +1,7 @@
 /target
 .idea/
 report.html
+node_modules
+dist
+.parcel-cache
+*.zip

@@ -1,5 +1,7 @@
 use std::path::Path;
-use shtats::{BufferedOutput, HtmlReporter, run_shtats};
+use shtats::html::HtmlReporter;
+use shtats::output::BufferedOutput;
+use shtats::process::run_shtats;
 
 fn main() {
     //git rev-list --all --count
@@ -17,43 +19,31 @@ fn main() {
         }
     }
 }
-
+//
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
-    use fasthash::city;
-    use itertools::Itertools;
+    use shtats::DuplicateDetector;
 
     #[test]
     fn test_something() {
         let data = vec!["blue
             green
-            red", "blue
+            red
+            purple", "blue
             green
-            red"];
+            red
+            purple","red
+            purple"];
 
-        let mut values: HashMap<u64, String> = HashMap::new();
-        let mut map: HashMap<u64, i32> = HashMap::new();
 
+        let mut dup_detector = DuplicateDetector::new(3);
         for bunch in data {
             let lines = bunch.split("\n").map(|x| x.trim()).collect::<Vec<&str>>();
-            let sets = lines.into_iter().powerset().collect::<Vec<_>>();
-            for set in sets.iter().filter(|x| x.len() > 1) {
-                let key = city::hash64(set.join(""));
-                *map.entry(key).or_insert(0) += 1;
-                if map[&key] == 2 {
-                    values.insert(key, set.clone().join(","));
-                }
-            }
+            dup_detector.add(lines);
         }
 
-        println!("{}", values.len());
-        for (key, value) in values {
-            let hash = key;
-            let files = value;
-            let count = map[&hash];
-
-            println!("{} - {}", count, files);
+        for item in dup_detector.results(){
+            println!("BING {}: {}", item.count, item.duplicate)
         }
     }
 }

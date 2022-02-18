@@ -27,7 +27,30 @@ jobs:
         run: find ./
       - name: Run tests
         run: cargo test --verbose
-
+  package:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ 15.x ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install global dependencies
+        run: npm install -g npx
+      - name: Install dependencies
+        working-directory: ./report/html
+        run: npm install -d
+      - name: Parcel
+        working-directory: ./report/html
+        run: npx parcel index.html
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v2
+        with:
+          name: index.html
+          path: output/test/code-coverage.html
   build:
     strategy:
       fail-fast: false

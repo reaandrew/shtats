@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        const wait = true;
+    </script>
+</head>
+<body>
+<div id="main" style="height:400px;width:100%;"></div>
+<script type="module">
+    import {Something} from './components/something.js';
+    import {h, Component, render} from 'preact';
+
+    // Create your app
+    const app = h('h1', null, 'Hello World!');
+
+    render(app, document.body);
+    Something('main');
+</script>
+</body>
+</html>
