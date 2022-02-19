@@ -6,7 +6,7 @@ mod stats;
 mod collectors;
 pub mod html;
 pub mod process;
-mod duplicates;
+pub mod duplicates;
 
 use viewmodel::{GitStatsViewModel};
 use crate::collectors::create_stat_collectors;

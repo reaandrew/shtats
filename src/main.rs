@@ -22,8 +22,7 @@ fn main() {
 //
 #[cfg(test)]
 mod tests {
-    use shtats::DuplicateDetector;
-
+    use shtats::duplicates::DuplicateDetector;
     #[test]
     fn test_something() {
         let data = vec!["blue
