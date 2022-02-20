@@ -9,8 +9,7 @@ fn main() {
     //  The above will give you the number of commits first so a progress bar can be displayed.
 
     let mut output = BufferedOutput::new();
-    let report_template = include_str!("../report/html/dist/index.html");
-    let reporter = HtmlReporter::new(report_template);
+    let reporter = HtmlReporter::new();
     match run_shtats(Path::new("."), &mut output, Box::new(reporter)) {
         Ok(_) => {
             println!("{}", output.to_string())
