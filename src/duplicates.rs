@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use fasthash::{metro};
 use itertools::Itertools;
 
 const MAX_POWERSET: usize = 10;
@@ -11,8 +10,8 @@ pub struct DuplicateInfo {
 
 #[derive(Clone, PartialEq)]
 pub struct DuplicateDetector {
-    values: HashMap<u64, String>,
-    map: HashMap<u64, i32>,
+    values: HashMap<u128, String>,
+    map: HashMap<u128, i32>,
     threshold: i32,
 }
 
@@ -34,7 +33,8 @@ impl DuplicateDetector {
     pub fn add(&mut self, data: Vec<&str>) {
         let sets = data.into_iter().take(MAX_POWERSET).powerset().collect::<Vec<_>>();
         for set in sets.iter().filter(|x| x.len() > 1) {
-            let key= metro::hash64(set.join(""));
+            //let key= metro::hash64(set.join(""));
+            let key = meowhash::MeowHasher::hash(set.join("").as_ref()).as_u128();
             //let key = city::hash64(set.join(""));
             *self.map.entry(key).or_insert(0) += 1;
             if self.map[&key] >= self.threshold {

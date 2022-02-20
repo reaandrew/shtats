@@ -25,12 +25,6 @@ dependencies = [
 
 [[package]]
 name = "cfg-if"
-version = "0.1.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4785bdd1c96b2a846b2bd7cc02e86b6b3dbf14e7e53446c4f54c92a361040822"
-
-[[package]]
-name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
@@ -49,32 +43,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "digest"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d3dd60d1080a57a05ab032377049e0591415d2b31afd7028356dbf3cc6dcb066"
+dependencies = [
+ "generic-array",
+]
+
+[[package]]
 name = "either"
 version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e78d4f1cc4ae33bbfc157ed5d5a5ef3bc29227303d595861deb238fcec4e9457"
-
-[[package]]
-name = "fasthash"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "032213946b4eaae09117ec63f020322b78ca7a31d8aa2cf64df3032e1579690f"
-dependencies = [
- "cfg-if 0.1.10",
- "fasthash-sys",
- "num-traits",
- "seahash",
- "xoroshiro128",
-]
-
-[[package]]
-name = "fasthash-sys"
-version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b6de941abfe2e715cdd34009d90546f850597eb69ca628ddfbf616e53dda28f8"
-dependencies = [
- "gcc",
-]
 
 [[package]]
 name = "fnv"
@@ -89,10 +70,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a06f77d526c1a601b7c4cdd98f54b5eaabffc14d5f2f0296febdc7f357c6d3ba"
 
 [[package]]
-name = "gcc"
-version = "0.3.55"
+name = "generic-array"
+version = "0.14.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8f5f3913fa0bfe7ee1fd8248b6b9f42a5af4b9d65ec2dd2c3c26132b950ecfc2"
+checksum = "fd48d33ec7f05fbfa152300fdad764757cbded343c1aa1cff2fbaf4134851803"
+dependencies = [
+ "typenum",
+ "version_check",
+]
 
 [[package]]
 name = "getopts"
@@ -109,7 +94,7 @@ version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "418d37c8b1d42553c93648be529cb70f920d3baf8ef469b74b9638df426e0b4c"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if",
  "libc",
  "wasi",
 ]
@@ -134,6 +119,15 @@ name = "memchr"
 version = "2.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "308cc39be01b73d0d18f82a0e7b2a3df85245f84af96fdddc5d202d27e47b86a"
+
+[[package]]
+name = "meowhash"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f31cc124c1dc48285daa66a3bd5e9f083fab93cb1fddafd661fe1862a883089b"
+dependencies = [
+ "digest",
+]
 
 [[package]]
 name = "num-integer"
@@ -272,12 +266,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "seahash"
-version = "3.0.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "58f57ca1d128a43733fd71d583e837b1f22239a37ebea09cde11d8d9a9080f47"
-
-[[package]]
 name = "serde"
 version = "1.0.136"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -303,8 +291,8 @@ version = "0.1.0"
 dependencies = [
  "bytesize",
  "chrono",
- "fasthash",
  "itertools",
+ "meowhash",
  "ramhorns",
  "tempdir",
  "uuid",
@@ -351,6 +339,12 @@ dependencies = [
  "libc",
  "winapi",
 ]
+
+[[package]]
+name = "typenum"
+version = "1.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dcf81ac59edc17cc8697ff311e8f5ef2d99fcbd9817b34cec66f90b6c3dfd987"
 
 [[package]]
 name = "unicase"
@@ -421,12 +415,3 @@ name = "winapi-x86_64-pc-windows-gnu"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
-
-[[package]]
-name = "xoroshiro128"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e0eeda34baec49c4f1eb2c04d59b761582fd6330010f9330ca696ca1a355dfcd"
-dependencies = [
- "rand",
-]
