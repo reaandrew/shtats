@@ -6,3 +6,4 @@ dist
 .parcel-cache
 *.zip
 index.html
+out.html
