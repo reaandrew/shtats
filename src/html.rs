@@ -17,7 +17,7 @@ impl Reporter for HtmlReporter {
 
 impl HtmlReporter {
     pub fn new() -> Self {
-        let report_template = include_str!("includes/report.html");
+        let report_template = include_str!("../report/html/dist/index.html");
         HtmlReporter {
             template: report_template.into()
         }
