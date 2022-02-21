@@ -46,6 +46,11 @@ export default function CommitsByMonth({data}){
         };
 
         option && myChart.setOption(option);
+        window.addEventListener('resize', function () {
+            if (myChart != null) {
+                myChart.resize();
+            }
+        });
     }
 
     useEffect(() => {
@@ -60,7 +65,7 @@ export default function CommitsByMonth({data}){
         <div className="row">
             <div className="col">
                 <h2>Commits by month</h2>
-                <div id="total_commits_by_month" className="chart"/>
+                <div id="total_commits_by_month" className="col chart"/>
             </div>
         </div>
     );

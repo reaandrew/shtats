@@ -43,6 +43,11 @@ export default function CommitsByWeekday({data}) {
         };
 
         option && myChart.setOption(option);
+        window.addEventListener('resize', function () {
+            if (myChart != null) {
+                myChart.resize();
+            }
+        });
     }
 
     useEffect(() => {
@@ -56,7 +61,7 @@ export default function CommitsByWeekday({data}) {
         <div className="row">
             <div className="col">
                 <h2>Commits by weekday</h2>
-                <div id="total_commits_by_weekday" className="chart"/>
+                <div id="total_commits_by_weekday" className="col chart"/>
             </div>
         </div>
     );
