@@ -1,9 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <link href="https://fonts.googleapis.com/css?family=Cardo:400,700|Oswald" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Shtats Report</title>
+    <meta name="description" content="A tool to get stats from GIT and generate a report">
+    <meta name="author" content="Andrew Rea">
+
+    <meta property="og:title" content="Shtats">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://shtats.com/">
+    <meta property="og:description" content="A tool to get stats from GIT and generate a report">
+<!--    <meta property="og:image" content="image.png">-->
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:wght@300|Oswald" rel="stylesheet">
     <style>
         @import "./static/bootstrap.min.css";
     </style>
@@ -11,21 +22,24 @@
         @import "./static/shtats.css";
     </style>
     <script>
-        let total_commits_by_day_model,total_lines_by_day_model;
-        const wait = true;
+        //let summaries, total_commits_by_day_model, total_lines_by_day_model;
+        const wait=!0;
     </script>
 </head>
 <body>
 <div id="main" style="height:400px;width:100%;"></div>
 <script type="module">
-    import {Something} from './components/something.js';
-    import {h, Component, render} from 'preact';
+    import {h, render} from 'preact';
+    import Report from './components/report';
+    import {Summary} from "./components/Summary";
+    import CommitsByDay from "./components/commits_by_day";
+    import CommitsByWeekday from "./components/commits_by_weekday";
 
-    // Create your app
-    const app = h('h1', null, 'Hello World!');
-
-    render(app, document.body);
-    Something('main');
+    render(<Report>
+        <Summary data={summaries}/>
+        <CommitsByDay data={total_commits_by_day_model} />
+        <CommitsByWeekday data={total_commits_by_day_model} />
+    </Report>, document.body);
 </script>
 </body>
 </html>

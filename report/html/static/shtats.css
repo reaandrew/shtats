@@ -1,8 +1,18 @@
 body {
-    font-family: 'Cardo', serif;
+    font-family: 'Open Sans Condensed', sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Oswald', sans-serif;
     text-transform: uppercase;
+}
+
+.header{
+    background-color: #2DA1EF;
+}
+
+.chart{
+    height:400px;
+    width:100%;
+    min-width: 100%;
 }

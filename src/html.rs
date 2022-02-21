@@ -8,6 +8,11 @@ pub struct HtmlReporter {
 impl Reporter for HtmlReporter {
     fn write(&self, output: &mut BufferedOutput, stats: GitStatsViewModel) {
         let data_template="
+const summaries = [
+{{#summary}}
+[\"{{name}}\",\"{{value}}\"],
+{{/summary}}
+];
 const total_commits_by_day_model = [
     {{#total_commits_by_day}}
         [\"{{key}}\",{{value}}],

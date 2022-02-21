@@ -24,7 +24,7 @@ fn parse_commit(line: &String, commit: &mut GitCommit) {
 
 /// Extracts the raw author string from the line i.e. Name <Email>
 fn parse_author(line: &String, commit: &mut GitCommit) {
-    commit.author = String::from(&line[8..]);
+    commit.author = String::from(line[8..].trim());
 }
 
 /// Extracts the date from the line
@@ -37,12 +37,13 @@ fn parse_date(line: &String, commit: &mut GitCommit) {
 fn parse_file_operation(line: &String, commit: &mut GitCommit) {
     let items = line.split("\t").collect::<Vec<&str>>();
 
-    let operation_value = items[0][31..].trim();
-    let operation = Operation::from_str(operation_value).expect("failed to parse file operation");
+    let operation_value = items[0].split_whitespace().last().expect("Could not extract operation").trim();
+
+    let operation = Operation::from_str(operation_value).expect("Could not parse operation");
 
     let file_value = items[1].trim();
 
-    commit.file_operations.push(FileOperation{
+    commit.file_operations.push(FileOperation {
         op: operation,
         file: String::from(file_value),
     });
@@ -159,14 +160,15 @@ mod parse_tests {
             ":000000 100644 0000000 3fb8f3d A\tLICENSE.md",
             ":000000 100644 0000000 8460aee A\tREADME.md",
             ":000000 100644 0000000 3a5a08a A\tsrc/main.rs",
-            ":000000 100644 0000000 1e94b1b A\tDapper.EntityFramework NET40/App.config"
+            ":000000 100644 0000000 1e94b1b A\tDapper.EntityFramework NET40/App.config",
+            ":100644 100644 7075b69663 2caeec3851 M\tsrc/Microsoft.AspNet.PipelineCore/DefaultHttpResponse.cs",
         ];
 
         for line in lines {
             parsers::parse_file_operation(&String::from(line), &mut commit);
         }
 
-        assert_eq!(8, commit.file_operations.len());
+        assert_eq!(9, commit.file_operations.len());
         assert_eq!(ADD, commit.file_operations[0].op);
         assert_eq!(".github/workflows/rust.yml", commit.file_operations[0].file);
         assert_eq!(MODIFY, commit.file_operations[1].op);
@@ -175,8 +177,9 @@ mod parse_tests {
         assert_eq!("Cargo.lock", commit.file_operations[2].file);
         assert_eq!(RENAME, commit.file_operations[3].op);
         assert_eq!("Cargo.toml", commit.file_operations[3].file);
-
         assert_eq!("Dapper.EntityFramework NET40/App.config", commit.file_operations[7].file);
+        assert_eq!(MODIFY, commit.file_operations[8].op);
+        assert_eq!("src/Microsoft.AspNet.PipelineCore/DefaultHttpResponse.cs", commit.file_operations[8].file);
     }
 
     #[test]

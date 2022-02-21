@@ -6,9 +6,6 @@ use crate::parsers::parse_git_log;
 
 pub fn process_commit(commit: &GitCommit, stat_functions: &Vec<Box<dyn GitStat>>, stats: &mut GitStats) {
     stats.count += 1;
-    if stats.count %10 == 0{
-        println!("{}", stats.count);
-    }
     for stat in stat_functions {
         stat.process(commit, stats);
     }
@@ -25,9 +22,9 @@ pub fn run_shtats(path: &Path, output: &mut BufferedOutput, reporter: Box<dyn Re
     let viewmodel = GitStatsViewModel::new(&stats.clone());
     reporter.write(output, viewmodel);
 
-    for item in stats.dup_detector.results(){
-        println!("DUP {}: {}", item.count, item.duplicate);
-    }
+    // for item in stats.dup_detector.results(){
+    //     println!("DUP {}: {}", item.count, item.duplicate);
+    // }
 
     Ok(())
 }

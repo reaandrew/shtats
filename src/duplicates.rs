@@ -33,9 +33,7 @@ impl DuplicateDetector {
     pub fn add(&mut self, data: Vec<&str>) {
         let sets = data.into_iter().take(MAX_POWERSET).powerset().collect::<Vec<_>>();
         for set in sets.iter().filter(|x| x.len() > 1) {
-            //let key= metro::hash64(set.join(""));
             let key = meowhash::MeowHasher::hash(set.join("").as_ref()).as_u128();
-            //let key = city::hash64(set.join(""));
             *self.map.entry(key).or_insert(0) += 1;
             if self.map[&key] >= self.threshold {
                 self.values.insert(key, set.clone().join(","));
