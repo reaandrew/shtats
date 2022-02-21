@@ -32,13 +32,11 @@
     import {h, render} from 'preact';
     import Report from './components/report';
     import {Summary} from "./components/Summary";
-    import CommitsByDay from "./components/commits_by_day";
-    import CommitsByWeekday from "./components/commits_by_weekday";
+    import Commits from "./components/commits";
 
     render(<Report>
         <Summary data={summaries}/>
-        <CommitsByDay data={total_commits_by_day_model} />
-        <CommitsByWeekday data={total_commits_by_day_model} />
+        <Commits data={total_commits_by_day_model} />
     </Report>, document.body);
 </script>
 </body>

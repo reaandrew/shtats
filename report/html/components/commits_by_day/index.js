@@ -1,9 +1,9 @@
-import { h } from 'preact';
+import {h} from 'preact';
 import * as echarts from "echarts";
 import {useEffect} from "preact/compat";
 
-export default function CommitsByDay({data}){
-    function bar_chart(element, data){
+export default function CommitsByDay({data}) {
+    function bar_chart(element, data) {
         const chartDom = document.getElementById(element);
         const myChart = echarts.init(chartDom);
         let option;
@@ -35,12 +35,13 @@ export default function CommitsByDay({data}){
         };
 
         option && myChart.setOption(option);
-        window.addEventListener('resize', function(){
-            if(myChart != null){
+        window.addEventListener('resize', function () {
+            if (myChart != null) {
                 myChart.resize();
             }
         });
     }
+
     useEffect(() => {
         bar_chart("total_commits_by_day", data)
     }, []); //
@@ -48,7 +49,11 @@ export default function CommitsByDay({data}){
         <div className="row">
             <div className="col">
                 <h2>Commits by day</h2>
-                <div id="total_commits_by_day" className="chart"/>
+                <div className="row">
+                    <div className="col">
+                        <div id="total_commits_by_day" className="chart"/>
+                    </div>
+                </div>
             </div>
         </div>
     )
