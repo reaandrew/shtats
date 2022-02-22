@@ -66,53 +66,7 @@
             },[]);
         }
 
-        function lines_added_vs_deleted(element, added, deleted){
-            const chartDom = document.getElementById(element);
-            const myChart = echarts.init(chartDom);
-            let option;
 
-            option = {
-                xAxis: {
-                    type: 'time',
-                },
-                yAxis: {
-                    type: 'value'
-                },
-                dataZoom: [
-                    {
-                        show: true,
-                        realtime: true
-                    },
-                ],
-                series: [
-                    {
-                        data: added,
-                        type: "bar",
-                        stack: 'Total',
-                        showSymbol: false,
-                    },
-                    {
-                        data: deleted,
-                        type: "bar",
-                        stack: 'Total',
-                        showSymbol: false,
-                    }
-                ],
-                grid: {
-                    left: 100,
-                    top: 50,
-                    right: 50,
-                    bottom: 50
-                }
-            };
-
-            option && myChart.setOption(option);
-            window.addEventListener('resize', function(){
-                if(myChart != null && myChart != undefined){
-                    myChart.resize();
-                }
-            });
-        }
         function simple_chart(element, data, type){
             const chartDom = document.getElementById(element);
             const myChart = echarts.init(chartDom);
