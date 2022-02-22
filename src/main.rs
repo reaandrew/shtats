@@ -8,6 +8,10 @@ fn main() {
     //
     //  The above will give you the number of commits first so a progress bar can be displayed.
 
+    // TODO: Duplicate Commit Messages
+    // TODO: Duplicate Commit Messages by user
+    // TODO: Commits By Year if no time filter has been applied
+
     let mut output = BufferedOutput::new();
     let reporter = HtmlReporter::new();
     match run_shtats(Path::new("."), &mut output, Box::new(reporter)) {
@@ -19,7 +23,7 @@ fn main() {
         }
     }
 }
-//
+
 #[cfg(test)]
 mod tests {
     use shtats::duplicates::DuplicateDetector;
