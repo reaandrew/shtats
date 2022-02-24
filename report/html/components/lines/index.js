@@ -3,6 +3,7 @@ import * as echarts from "echarts";
 import {useEffect} from "preact/compat";
 import LinesAddedDeleted from "../lines_added_deleted";
 import LinesCumulative from "../lines_cumulative";
+import LinesAddedDeletedSummary from "../lines_added_deleted_summary";
 
 
 export default function Lines({data}) {
@@ -16,6 +17,9 @@ export default function Lines({data}) {
             <div className="row">
                 <div className="col">
                     <LinesCumulative data={data}/>
+                </div>
+                <div className="col-3">
+                    <LinesAddedDeletedSummary data={data} />
                 </div>
             </div>
         </div>
