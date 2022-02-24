@@ -21,12 +21,23 @@ struct LinesValue{
     lines_deleted: i32
 }
 
+#[derive(Content)]
+struct FilesValue{
+    key: String,
+    files_added: i32,
+    files_deleted: i32,
+    files_modified: i32,
+    files_renamed: i32
+}
+
+
 
 #[derive(Content)]
 pub struct GitStatsViewModel {
     summary: Vec<SummaryViewModel>,
     total_commits_by_day: Vec<KeyValue>,
-    total_lines_by_day: Vec<LinesValue>
+    total_lines_by_day: Vec<LinesValue>,
+    total_files_by_day: Vec<FilesValue>
 }
 
 impl GitStatsViewModel {
@@ -34,7 +45,8 @@ impl GitStatsViewModel {
         let mut instance = Self {
             summary: vec![],
             total_commits_by_day: vec![],
-            total_lines_by_day: vec![]
+            total_lines_by_day: vec![],
+            total_files_by_day: vec![]
         };
 
 
@@ -57,6 +69,17 @@ impl GitStatsViewModel {
             })
         }
         instance.total_lines_by_day.sort_by(|a, b| a.key.cmp(&b.key));
+
+        for (key, value) in stats.total_files_by_day.clone(){
+            instance.total_files_by_day.push(FilesValue{
+                key,
+                files_added: value.added,
+                files_deleted: value.deleted,
+                files_modified: value.modified,
+                files_renamed: value.renamed
+            })
+        }
+        instance.total_files_by_day.sort_by(|a, b| a.key.cmp(&b.key));
         return instance;
     }
 

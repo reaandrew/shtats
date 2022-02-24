@@ -7,7 +7,7 @@ import LinesAddedDeletedSummary from "../components/lines_added_deleted_summary"
 import {generate_data} from "./utils";
 
 export default {
-    title: 'Shtats/Lines Added Deleted Summary',
+    title: 'Shtats/Lines Added Deleted Index',
     component: LinesAddedDeletedSummary,
 };
 

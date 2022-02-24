@@ -27,6 +27,14 @@ pub struct LineStats {
 }
 
 #[derive(Default, Clone, PartialEq)]
+pub struct FileStats {
+    pub(crate) added: i32,
+    pub(crate) modified: i32,
+    pub(crate) deleted: i32,
+    pub(crate) renamed: i32,
+}
+
+#[derive(Default, Clone, PartialEq)]
 pub struct MessageStats {
     pub(crate) max_size: i32,
     pub(crate) max_lines: i32,
@@ -42,6 +50,7 @@ pub struct GitStats {
     pub(crate) summary: SummaryStats,
     pub(crate) total_commits_by_day: HashMap<String, i32>,
     pub(crate) total_lines_by_day: HashMap<String, LineStats>,
+    pub(crate) total_files_by_day: HashMap<String, FileStats>,
     pub(crate) total_message_lines: i32,
     pub(crate) total_message_size: i32,
     pub(crate) message_stats: MessageStats,
@@ -55,6 +64,7 @@ impl GitStats{
             summary: Default::default(),
             total_commits_by_day: Default::default(),
             total_lines_by_day: Default::default(),
+            total_files_by_day: Default::default(),
             total_message_lines: 0,
             total_message_size: 0,
             message_stats: Default::default(),

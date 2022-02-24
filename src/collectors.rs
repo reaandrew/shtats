@@ -1,4 +1,5 @@
 use crate::{GitCommit, GitStat, GitStats, LineStats};
+use crate::stats::FileStats;
 
 struct SummaryStatsCollector {}
 
@@ -40,6 +41,24 @@ impl GitStat for TotalLinesByDayCollector {
             });
         stat.added += commit.total_lines_added();
         stat.deleted += commit.total_lines_deleted();
+    }
+}
+
+struct TotalFilesByDayCollector{}
+
+impl GitStat for TotalFilesByDayCollector{
+    fn process(&self, commit: &GitCommit, stats: &mut GitStats) {
+        let stat = stats.total_files_by_day.entry(commit.day_key())
+            .or_insert(FileStats {
+                added: 0,
+                modified: 0,
+                deleted: 0,
+                renamed: 0
+            });
+        stat.added += commit.total_files_added();
+        stat.deleted += commit.total_files_deleted();
+        stat.modified += commit.total_files_modified();
+        stat.renamed += commit.total_files_renamed();
     }
 }
 
@@ -93,6 +112,7 @@ pub fn create_stat_collectors() -> Vec<Box<dyn GitStat>> {
         Box::new(TotalLinesByDayCollector {}),
         Box::new(MessageStatsCollector {}),
         Box::new(SimilarFilesChangingCollector{}),
+        Box::new(TotalFilesByDayCollector{})
     ];
     stats_functions
 }

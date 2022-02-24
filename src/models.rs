@@ -1,5 +1,6 @@
 use std::str::FromStr;
 use chrono::{DateTime, FixedOffset, Utc};
+use crate::models::Operation::{ADD, DELETE, MODIFY, RENAME};
 
 #[derive(Clone, PartialEq, Debug)]
 #[repr(u8)]
@@ -78,6 +79,22 @@ impl GitCommit {
 
     pub(crate) fn total_message_lines(&self) -> i32 {
         return self.message.len() as i32;
+    }
+
+    pub (crate) fn total_files_added(&self) -> i32{
+        return self.file_operations.iter().filter(|x| x.op == ADD).count() as i32;
+    }
+
+    pub (crate) fn total_files_deleted(&self) -> i32{
+        return self.file_operations.iter().filter(|x|x.op == DELETE).count() as i32;
+    }
+
+    pub (crate) fn total_files_modified(&self) -> i32{
+        return self.file_operations.iter().filter(|x|x.op == MODIFY).count() as i32;
+    }
+
+    pub (crate) fn total_files_renamed(&self) -> i32{
+        return self.file_operations.iter().filter(|x|x.op == RENAME).count() as i32;
     }
 }
 

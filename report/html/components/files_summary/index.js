@@ -2,14 +2,16 @@ import {h} from 'preact';
 import {useEffect} from "preact/compat";
 import * as echarts from "echarts";
 
-export default function LinesAddedDeletedSummary({data}){
+export default function FilesSummary({data}){
 
-    function summarise_added_deleted(data){
+    function summarise_file_operations(data){
         return data.reduce((prev, curr) => {
             prev.added += curr[1];
             prev.deleted += curr[2];
+            prev.modified += curr[3];
+            prev.renamed += curr[4];
             return prev;
-        }, {added:0, deleted:0})
+        }, {added:0, deleted:0, modified:0, renamed:0})
     }
 
     function pie_chart(element, data) {
@@ -29,13 +31,15 @@ export default function LinesAddedDeletedSummary({data}){
             },
             series: [
                 {
-                    color: ['#2DA1EF','#fd0e35'],
+                    color: ['#2DA1EF', '#00bef4', '#00d6de', '#18e8b6'],
                     name: '',
                     type: 'pie',
                     radius: '50%',
                     data: [
                         {value: data.added, name: 'Added'},
                         {value: data.deleted, name: 'Deleted'},
+                        {value: data.added, name: 'Modified'},
+                        {value: data.deleted, name: 'Renamed'},
                     ],
                     emphasis: {
                         itemStyle: {
@@ -57,14 +61,14 @@ export default function LinesAddedDeletedSummary({data}){
     }
 
     useEffect(() => {
-        pie_chart("lines_added_deleted_summary", summarise_added_deleted((data)))
+        pie_chart("files_summary", summarise_file_operations((data)))
     }, [])
 
     return (
         <div className="row">
             <div className="col">
-                <h2>Lines Summary</h2>
-                <div id="lines_added_deleted_summary" className="col chart"/>
+                <h2>Files Summary</h2>
+                <div id="files_summary" className="col chart"/>
             </div>
         </div>
     )
