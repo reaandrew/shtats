@@ -15,10 +15,10 @@ export default function Commits({data}) {
                 </div>
             </div>
             <div className="row">
-                <div className="col">
+                <div className="col-6">
                     <CommitsByWeekday data={data} />
                 </div>
-                <div className="col">
+                <div className="col-6">
                     <CommitsByMonth data={data} />
                 </div>
             </div>

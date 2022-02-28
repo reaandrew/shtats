@@ -56,3 +56,33 @@ impl DuplicateDetector {
     }
 
 }
+
+
+#[cfg(test)]
+mod tests {
+    use crate::duplicates::DuplicateDetector;
+
+    #[test]
+    fn test_something() {
+        let data = vec!["blue
+            green
+            red
+            purple", "blue
+            green
+            red
+            purple", "red
+            purple"];
+
+
+        let mut dup_detector = DuplicateDetector::new(3);
+        for bunch in data {
+            let lines = bunch.split("\n").map(|x| x.trim()).collect::<Vec<&str>>();
+            dup_detector.add(lines);
+        }
+
+        for item in dup_detector.results() {
+            println!("BING {}: {}", item.count, item.duplicate)
+        }
+    }
+}
+
