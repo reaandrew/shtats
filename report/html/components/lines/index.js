@@ -15,10 +15,10 @@ export default function Lines({data}) {
                 </div>
             </div>
             <div className="row">
-                <div className="col">
+                <div className="col-8">
                     <LinesCumulative data={data}/>
                 </div>
-                <div className="col-3">
+                <div className="col-4">
                     <LinesAddedDeletedSummary data={data} />
                 </div>
             </div>

@@ -1,6 +1,8 @@
 # shtats
 
-A tool to generate a report showing statistics for git.
+A tool to visualise stats from GIT.
+
+<img alt="shtats report" src="docs/images/shtats.png" width="300"/>
 
 ## Platforms
 

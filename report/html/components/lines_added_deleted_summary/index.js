@@ -64,7 +64,7 @@ export default function LinesAddedDeletedSummary({data}){
         <div className="row">
             <div className="col">
                 <h2>Lines Summary</h2>
-                <div id="lines_added_deleted_summary" className="col chart"/>
+                <div id="lines_added_deleted_summary" className="chart"/>
             </div>
         </div>
     )

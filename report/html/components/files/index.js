@@ -8,10 +8,10 @@ export default function Lines({data}) {
     return (
         <div>
             <div className="row">
-                <div className="col">
+                <div className="col-8">
                     <FilesCumulative data={data}/>
                 </div>
-                <div className="col-3">
+                <div className="col-4">
                     <FilesSummary data={data} />
                 </div>
             </div>
