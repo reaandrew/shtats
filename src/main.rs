@@ -1,7 +1,9 @@
 use std::path::Path;
+use clap::{Arg, Command, Parser};
 use shtats::html::HtmlReporter;
 use shtats::output::BufferedOutput;
 use shtats::process::run_shtats;
+
 
 fn main() {
     //git rev-list --all --count
@@ -11,6 +13,20 @@ fn main() {
     // TODO: Duplicate Commit Messages
     // TODO: Duplicate Commit Messages by user
     // TODO: Commits By Year if no time filter has been applied
+    let m = Command::new("My Program")
+        .author("Me, me@mail.com")
+        .version("1.0.2")
+        .about("Explains in brief what the program does")
+        .subcommand(Command::new("run").arg(
+            Arg::new("until")
+                .long("until")
+                .help("gather stats on all commits until this date"),
+        ).arg(
+            Arg::new("since")
+                .long("since")
+                .help("gather stats on all commits since this date"),
+        ), )
+        .get_matches();
 
     let mut output = BufferedOutput::new();
     let reporter = HtmlReporter::new();
@@ -27,6 +43,7 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use shtats::duplicates::DuplicateDetector;
+
     #[test]
     fn test_something() {
         let data = vec!["blue
@@ -35,7 +52,7 @@ mod tests {
             purple", "blue
             green
             red
-            purple","red
+            purple", "red
             purple"];
 
 
@@ -45,7 +62,7 @@ mod tests {
             dup_detector.add(lines);
         }
 
-        for item in dup_detector.results(){
+        for item in dup_detector.results() {
             println!("BING {}: {}", item.count, item.duplicate)
         }
     }
