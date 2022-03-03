@@ -301,6 +301,6 @@ mod collector_tests {
         process_commit(&commit_2, &stat_functions, &mut stats, &||{});
 
 
-        assert_eq!(stats.summary.total_lines_deleted, 9);
+        assert_eq!(stats.summary.total_lines_deleted, 9 );
     }
 }
