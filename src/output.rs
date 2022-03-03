@@ -9,7 +9,7 @@ impl BufferedOutput {
     }
 
     pub fn write(&mut self, data: String) {
-        self.0.write_all(data.as_bytes());
+        self.0.write_all(data.as_bytes()).expect("error writing data to buffered output");
     }
 
     pub fn to_string(self) -> String {

@@ -120,6 +120,7 @@ pub fn create_stat_collectors() -> Vec<Box<dyn GitStat>> {
 
 #[cfg(test)]
 mod collector_tests {
+    use chrono::{DateTime, Utc};
     use crate::{GitCommit, GitStat, GitStats};
     use crate::collectors::SummaryStatsCollector;
     use crate::process::process_commit;
@@ -138,5 +139,21 @@ mod collector_tests {
         process_commit(&commit, &stat_functions, &mut stats, &||{});
 
         assert_eq!(1, stats.summary.commit_count);
+    }
+
+    #[test]
+    fn test_summary_stats_collector_date_1_commit(){
+        let mut commit: GitCommit = GitCommit::default();
+        commit.date = DateTime::from(Utc::now());
+
+        let stat_functions: Vec<Box<dyn GitStat>> = vec![
+            Box::new(SummaryStatsCollector {})
+        ];
+
+        let mut stats: GitStats = Default::default();
+
+        process_commit(&commit, &stat_functions, &mut stats, &||{});
+
+        assert_eq!(commit.date.to_string(), stats.summary.date_first_commit);
     }
 }

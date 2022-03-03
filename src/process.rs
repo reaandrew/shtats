@@ -1,9 +1,8 @@
-use std::ffi::OsStr;
 use std::fs::File;
 use std::io::{Error, Write};
 use std::path::Path;
 use std::process::{ChildStdout, Command, Stdio};
-use crate::{BufferedOutput, create_stat_collectors, GitCommit, GitStat, GitStats, GitStatsViewModel, Reporter};
+use crate::{create_stat_collectors, GitCommit, GitStat, GitStats, GitStatsViewModel, Reporter};
 use crate::parsers::parse_git_log;
 
 #[derive(Default)]
