@@ -1,6 +1,7 @@
 use shtats::html::HtmlReporter;
 use shtats::output::BufferedOutput;
 use shtats::process::Config;
+use shtats::Reporter;
 
 mod common;
 
@@ -16,7 +17,7 @@ fn test_cli_report() {
             output: "".to_string()
         }, &|| {})?;
 
-        assert!(output.to_string().contains("<tr>
+        assert!(reporter.to_string().contains("<tr>
                     <td>Number of commits</td>
                     <td>3</td>
                 </tr>"));
