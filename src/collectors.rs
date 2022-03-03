@@ -175,4 +175,39 @@ mod collector_tests {
 
         assert_eq!(commit_1.date.to_string(), stats.summary.date_first_commit);
     }
+
+    #[test]
+    fn test_summary_stats_collector_first_committer_1_commit(){
+        let mut commit: GitCommit = GitCommit::default();
+        commit.author = String::from("Bob");
+
+        let stat_functions: Vec<Box<dyn GitStat>> = vec![
+            Box::new(SummaryStatsCollector {})
+        ];
+
+        let mut stats: GitStats = Default::default();
+
+        process_commit(&commit, &stat_functions, &mut stats, &||{});
+
+        assert_eq!(stats.summary.first_committer, "Bob");
+    }
+
+    #[test]
+    fn test_summary_stats_collector_first_committer_2_commits(){
+        let mut commit_1: GitCommit = GitCommit::default();
+        commit_1.author = String::from("Jeff");
+        let mut commit_2: GitCommit = GitCommit::default();
+        commit_2.author = String::from("Alan");
+
+        let stat_functions: Vec<Box<dyn GitStat>> = vec![
+            Box::new(SummaryStatsCollector {})
+        ];
+
+        let mut stats: GitStats = Default::default();
+
+        process_commit(&commit_1, &stat_functions, &mut stats, &||{});
+        process_commit(&commit_2, &stat_functions, &mut stats, &||{});
+
+        assert_eq!(stats.summary.first_committer, "Jeff");
+    }
 }
