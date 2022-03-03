@@ -9,7 +9,7 @@ mod common;
 #[ignore]
 fn test_cli_report() {
     common::setup_git_repo(|path| {
-        let mut output = BufferedOutput::new();
+        let output = BufferedOutput::new();
         let mut reporter = HtmlReporter::new(output);
         shtats::process::run_shtats(path, &mut reporter, Config{
             until: None,

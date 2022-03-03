@@ -119,7 +119,7 @@ pub fn create_stat_collectors() -> Vec<Box<dyn GitStat>> {
 
 
 #[cfg(test)]
-mod collector_tests {
+mod summary_stats_collector_tests {
     use chrono::{DateTime, Duration, Utc};
     use crate::{GitCommit, GitStat, GitStats};
     use crate::collectors::SummaryStatsCollector;
@@ -143,7 +143,7 @@ mod collector_tests {
     }
 
     #[test]
-    fn test_summary_stats_collector_date_1_commit(){
+    fn test_date_1_commit(){
         let mut commit: GitCommit = GitCommit::default();
         commit.date = DateTime::from(Utc::now());
 
@@ -159,7 +159,7 @@ mod collector_tests {
     }
 
     #[test]
-    fn test_summary_stats_collector_date_2_commits(){
+    fn test_date_2_commits(){
         let mut commit_1: GitCommit = GitCommit::default();
         commit_1.date = DateTime::from(Utc::now() - Duration::days(2));
         let mut commit_2: GitCommit = GitCommit::default();
@@ -178,7 +178,7 @@ mod collector_tests {
     }
 
     #[test]
-    fn test_summary_stats_collector_first_committer_1_commit(){
+    fn test_first_committer_1_commit(){
         let mut commit: GitCommit = GitCommit::default();
         commit.author = String::from("Bob");
 
@@ -194,7 +194,7 @@ mod collector_tests {
     }
 
     #[test]
-    fn test_summary_stats_collector_first_committer_2_commits(){
+    fn test_first_committer_2_commits(){
         let mut commit_1: GitCommit = GitCommit::default();
         commit_1.author = String::from("Jeff");
         let mut commit_2: GitCommit = GitCommit::default();
@@ -213,7 +213,7 @@ mod collector_tests {
     }
 
     #[test]
-    fn test_summary_stats_collector_lines_added_1_commit(){
+    fn test_lines_added_1_commit(){
         let mut commit: GitCommit = GitCommit::default();
         commit.line_stats = vec![LineStat{
             lines_added: 10,
@@ -232,7 +232,7 @@ mod collector_tests {
     }
 
     #[test]
-    fn test_summary_stats_collector_lines_added_2_commit(){
+    fn test_lines_added_2_commit(){
         let mut commit_1: GitCommit = GitCommit::default();
         commit_1.line_stats = vec![LineStat{
             lines_added: 10,
@@ -259,7 +259,7 @@ mod collector_tests {
     }
 
     #[test]
-    fn test_summary_stats_collector_lines_deleted_1_commit(){
+    fn test_lines_deleted_1_commit(){
         let mut commit: GitCommit = GitCommit::default();
         commit.line_stats = vec![LineStat{
             lines_added: 0,
@@ -278,7 +278,7 @@ mod collector_tests {
     }
 
     #[test]
-    fn test_summary_stats_collector_lines_deleted_2_commit(){
+    fn test_lines_deleted_2_commit(){
         let mut commit_1: GitCommit = GitCommit::default();
         commit_1.line_stats = vec![LineStat{
             lines_added: 0,

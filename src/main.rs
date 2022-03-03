@@ -6,7 +6,6 @@ use shtats::output::BufferedOutput;
 use shtats::process::{Config, get_number_of_commits, run_shtats};
 use git_version::git_version;
 use indicatif::ProgressBar;
-use shtats::Reporter;
 
 const GIT_VERSION: &str = git_version!();
 

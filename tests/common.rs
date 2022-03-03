@@ -20,7 +20,7 @@ fn git_status(path: &PathBuf) -> Result<(), Error> {
     let mut git_status = Command::new("git");
     git_status.args(vec!["status"]);
     git_status.stdout(Stdio::piped());
-    let output = git_status.current_dir(
+    let _output = git_status.current_dir(
         &path
     ).output()?;
 
@@ -46,7 +46,7 @@ fn git_commit(path: &PathBuf, message: &str) -> Result<(), Error>{
         message
     ]);
     git_commit.stdout(Stdio::piped());
-    let output = git_commit.current_dir(
+    let _output = git_commit.current_dir(
         &path
     ).output()?;
 
@@ -60,7 +60,7 @@ fn git_log(path: &PathBuf) -> Result<(), Error>{
         "--oneline"
     ]);
     git_log.stdout(Stdio::piped());
-    let output = git_log.current_dir(
+    let _output = git_log.current_dir(
         &path
     ).output()?;
     Ok(())
