@@ -123,6 +123,7 @@ mod collector_tests {
     use chrono::{DateTime, Duration, Utc};
     use crate::{GitCommit, GitStat, GitStats};
     use crate::collectors::SummaryStatsCollector;
+    use crate::models::LineStat;
     use crate::process::process_commit;
 
     #[test]
@@ -209,5 +210,51 @@ mod collector_tests {
         process_commit(&commit_2, &stat_functions, &mut stats, &||{});
 
         assert_eq!(stats.summary.first_committer, "Jeff");
+    }
+
+    #[test]
+    fn test_summary_stats_collector_lines_added_1_commit(){
+        let mut commit: GitCommit = GitCommit::default();
+        commit.line_stats = vec![LineStat{
+            lines_added: 10,
+            lines_deleted: 0
+        }];
+
+        let stat_functions: Vec<Box<dyn GitStat>> = vec![
+            Box::new(SummaryStatsCollector {})
+        ];
+
+        let mut stats: GitStats = Default::default();
+
+        process_commit(&commit, &stat_functions, &mut stats, &||{});
+
+        assert_eq!(stats.summary.total_lines_added, 10);
+    }
+
+    #[test]
+    fn test_summary_stats_collector_lines_added_2_commit(){
+        let mut commit_1: GitCommit = GitCommit::default();
+        commit_1.line_stats = vec![LineStat{
+            lines_added: 10,
+            lines_deleted: 0
+        }];
+
+        let mut commit_2: GitCommit = GitCommit::default();
+        commit_2.line_stats = vec![LineStat{
+            lines_added: 5,
+            lines_deleted: 0
+        }];
+
+        let stat_functions: Vec<Box<dyn GitStat>> = vec![
+            Box::new(SummaryStatsCollector {})
+        ];
+
+        let mut stats: GitStats = Default::default();
+
+        process_commit(&commit_1, &stat_functions, &mut stats, &||{});
+        process_commit(&commit_2, &stat_functions, &mut stats, &||{});
+
+
+        assert_eq!(stats.summary.total_lines_added, 15);
     }
 }
