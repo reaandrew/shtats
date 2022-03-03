@@ -1,18 +1,18 @@
+use std::io::Write;
 
-pub struct BufferedOutput {
-    data: String,
-}
+#[derive(Clone)]
+pub struct BufferedOutput (Vec<u8>);
 
 impl BufferedOutput {
     pub fn new() -> Self {
-        Self { data: "".into() }
+        return BufferedOutput(Vec::new());
     }
 
     pub fn write(&mut self, data: String) {
-        self.data = data;
+        self.0.write_all(data.as_bytes());
     }
 
-    pub fn to_string(&self) -> String {
-        return self.data.clone();
+    pub fn to_string(self) -> String {
+        String::from_utf8(self.0).unwrap()
     }
 }

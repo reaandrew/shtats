@@ -1,12 +1,14 @@
 use ramhorns::Template;
 use crate::{BufferedOutput, GitStatsViewModel, Reporter};
 
+#[derive(Clone)]
 pub struct HtmlReporter {
     template: String,
+    output: BufferedOutput
 }
 
 impl Reporter for HtmlReporter {
-    fn write(&self, output: &mut BufferedOutput, stats: GitStatsViewModel) {
+    fn write(&mut self, stats: GitStatsViewModel) {
         let data_template="
 const summaries = [
 {{#summary}}
@@ -33,15 +35,20 @@ const total_files_by_day_model = [
 
         let rendered = tpl.render(&stats);
 
-        output.write(rendered);
+        self.output.write(rendered);
+    }
+
+    fn to_string(&self) -> String {
+        return self.output.clone().to_string();
     }
 }
 
 impl HtmlReporter {
-    pub fn new() -> Self {
+    pub fn new(output: BufferedOutput) -> Self {
         let report_template = include_str!("../index.html") ;
         HtmlReporter {
-            template: report_template.into()
+            template: report_template.into(),
+            output
         }
     }
 }

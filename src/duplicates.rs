@@ -80,9 +80,9 @@ mod tests {
             dup_detector.add(lines);
         }
 
-        for item in dup_detector.results() {
-            println!("BING {}: {}", item.count, item.duplicate)
-        }
+        // for item in dup_detector.results() {
+        //     println!("BING {}: {}", item.count, item.duplicate)
+        // }
     }
 }
 

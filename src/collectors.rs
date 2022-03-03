@@ -111,7 +111,7 @@ pub fn create_stat_collectors() -> Vec<Box<dyn GitStat>> {
         Box::new(TotalCommitsByDayCollector {}),
         Box::new(TotalLinesByDayCollector {}),
         Box::new(MessageStatsCollector {}),
-        Box::new(SimilarFilesChangingCollector{}),
+        //Box::new(SimilarFilesChangingCollector{}),
         Box::new(TotalFilesByDayCollector{})
     ];
     stats_functions
@@ -135,7 +135,7 @@ mod collector_tests {
 
         let mut stats: GitStats = Default::default();
 
-        process_commit(&commit, &stat_functions, &mut stats);
+        process_commit(&commit, &stat_functions, &mut stats, );
 
         assert_eq!(1, stats.summary.commit_count);
     }

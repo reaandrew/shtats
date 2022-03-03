@@ -66,7 +66,8 @@ fn parse_message(line: &String, commit: &mut GitCommit) {
     commit.message.push(String::from(line));
 }
 
-pub(crate) fn parse_git_log(stats_functions: &Vec<Box<dyn GitStat>>, mut stats: &mut GitStats, stdout: ChildStdout) {
+// TODO: Change design to reduce number of arguments.
+pub(crate) fn parse_git_log(stats_functions: &Vec<Box<dyn GitStat>>, mut stats: &mut GitStats, stdout: ChildStdout, process_callback: &dyn Fn() -> ()) {
     let mut reader = BufReader::new(stdout);
     let mut current: GitCommit = GitCommit::default();
     let mut s = String::new();
@@ -83,7 +84,7 @@ pub(crate) fn parse_git_log(stats_functions: &Vec<Box<dyn GitStat>>, mut stats: 
                 if start {
                     start = false;
                 } else {
-                    process_commit(&current, &stats_functions, &mut stats);
+                    process_commit(&current, &stats_functions, &mut stats, process_callback);
                 }
                 current = GitCommit::default();
                 parse_commit(&s, &mut current);
@@ -106,7 +107,7 @@ pub(crate) fn parse_git_log(stats_functions: &Vec<Box<dyn GitStat>>, mut stats: 
             }
         }
     }
-    process_commit(&current, &stats_functions, &mut stats);
+    process_commit(&current, &stats_functions, &mut stats, &||{});
 }
 
 #[cfg(test)]

@@ -1,17 +1,16 @@
 use std::path::Path;
+use std::process::exit;
 use clap::{Arg, Command};
 use shtats::html::HtmlReporter;
 use shtats::output::BufferedOutput;
-use shtats::process::{Config, run_shtats};
+use shtats::process::{Config, get_number_of_commits, run_shtats};
 use git_version::git_version;
+use indicatif::ProgressBar;
+use shtats::Reporter;
 
 const GIT_VERSION: &str = git_version!();
 
 fn main() {
-    //git rev-list --all --count
-    //
-    //  The above will give you the number of commits first so a progress bar can be displayed.
-
     // TODO: Duplicate Commit Messages
     // TODO: Duplicate Commit Messages by user
     // TODO: Commits By Year if no time filter has been applied
@@ -31,6 +30,14 @@ fn main() {
                 .allow_invalid_utf8(true)
                 .takes_value(true)
                 .help("gather stats on all commits since this date"),
+        ).arg(
+            Arg::new("output")
+                .short('o')
+                .long("output")
+                .allow_invalid_utf8(true)
+                .takes_value(true)
+                .default_value("report.html")
+                .help("output filename to write the report to"),
         ), )
         .get_matches();
 
@@ -57,20 +64,28 @@ fn main() {
         }
     };
 
-
-
-    let mut output = BufferedOutput::new();
-    let reporter = HtmlReporter::new();
-
-    match run_shtats(Path::new("."),
-                     &mut output,
-                     Box::new(reporter),
-                     config) {
-        Ok(_) => {
-            println!("{}", output.to_string())
+    match run_matches
+        .value_of_os("output"){
+        None => {}
+        Some(output) => {
+            config.output = String::from(output.to_str().unwrap())
         }
-        Err(_) => {
-            println!("something went wrong");
+    };
+
+    let number_of_commits = get_number_of_commits();
+    let pb = ProgressBar::new(number_of_commits as u64);
+    let mut reporter = HtmlReporter::new(BufferedOutput::new());
+    let process_callback = || pb.inc(1);
+    match run_shtats(Path::new("."),
+                     &mut reporter,
+                     config,
+                     &process_callback) {
+        Ok(_) => {
+            pb.finish_with_message("done");
+        }
+        Err(err) => {
+            eprintln!("error: {:?}", err);
+            exit(-1);
         }
     }
 }

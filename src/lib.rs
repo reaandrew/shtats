@@ -16,7 +16,8 @@ use crate::stats::{GitStat, GitStats, LineStats};
 
 
 pub trait Reporter {
-    fn write(&self, output: &mut BufferedOutput, stats: GitStatsViewModel);
+    fn write(&mut self, stats: GitStatsViewModel);
+    fn to_string(&self) -> String;
 }
 
 

@@ -24,7 +24,6 @@ fn git_status(path: &PathBuf) -> Result<(), Error> {
         &path
     ).output()?;
 
-    println!("{}", String::from_utf8(output.stdout).unwrap());
     Ok(())
 }
 
@@ -51,7 +50,6 @@ fn git_commit(path: &PathBuf, message: &str) -> Result<(), Error>{
         &path
     ).output()?;
 
-    println!("{}", String::from_utf8(output.stdout).unwrap());
     Ok(())
 }
 
@@ -65,7 +63,6 @@ fn git_log(path: &PathBuf) -> Result<(), Error>{
     let output = git_log.current_dir(
         &path
     ).output()?;
-    println!("{}", String::from_utf8(output.stdout).unwrap());
     Ok(())
 }
 

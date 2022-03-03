@@ -7,3 +7,5 @@ dist
 *.zip
 index.html
 out.html
+*.log
+sample.html
