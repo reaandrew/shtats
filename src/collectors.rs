@@ -257,4 +257,50 @@ mod collector_tests {
 
         assert_eq!(stats.summary.total_lines_added, 15);
     }
+
+    #[test]
+    fn test_summary_stats_collector_lines_deleted_1_commit(){
+        let mut commit: GitCommit = GitCommit::default();
+        commit.line_stats = vec![LineStat{
+            lines_added: 0,
+            lines_deleted: 2
+        }];
+
+        let stat_functions: Vec<Box<dyn GitStat>> = vec![
+            Box::new(SummaryStatsCollector {})
+        ];
+
+        let mut stats: GitStats = Default::default();
+
+        process_commit(&commit, &stat_functions, &mut stats, &||{});
+
+        assert_eq!(stats.summary.total_lines_deleted, 2);
+    }
+
+    #[test]
+    fn test_summary_stats_collector_lines_deleted_2_commit(){
+        let mut commit_1: GitCommit = GitCommit::default();
+        commit_1.line_stats = vec![LineStat{
+            lines_added: 0,
+            lines_deleted: 2
+        }];
+
+        let mut commit_2: GitCommit = GitCommit::default();
+        commit_2.line_stats = vec![LineStat{
+            lines_added: 0,
+            lines_deleted: 7
+        }];
+
+        let stat_functions: Vec<Box<dyn GitStat>> = vec![
+            Box::new(SummaryStatsCollector {})
+        ];
+
+        let mut stats: GitStats = Default::default();
+
+        process_commit(&commit_1, &stat_functions, &mut stats, &||{});
+        process_commit(&commit_2, &stat_functions, &mut stats, &||{});
+
+
+        assert_eq!(stats.summary.total_lines_deleted, 9);
+    }
 }
