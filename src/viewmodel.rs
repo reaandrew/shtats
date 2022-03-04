@@ -30,14 +30,20 @@ struct FilesValue{
     files_renamed: i32
 }
 
-
+#[derive(Content)]
+struct PunchesValue{
+    weekday: u32,
+    hour: u32,
+    commits: u32
+}
 
 #[derive(Content)]
 pub struct GitStatsViewModel {
     summary: Vec<SummaryViewModel>,
     total_commits_by_day: Vec<KeyValue>,
     total_lines_by_day: Vec<LinesValue>,
-    total_files_by_day: Vec<FilesValue>
+    total_files_by_day: Vec<FilesValue>,
+    punch_data: Vec<PunchesValue>
 }
 
 impl GitStatsViewModel {
@@ -46,7 +52,8 @@ impl GitStatsViewModel {
             summary: vec![],
             total_commits_by_day: vec![],
             total_lines_by_day: vec![],
-            total_files_by_day: vec![]
+            total_files_by_day: vec![],
+            punch_data: vec![]
         };
 
 
@@ -80,6 +87,14 @@ impl GitStatsViewModel {
             })
         }
         instance.total_files_by_day.sort_by(|a, b| a.key.cmp(&b.key));
+        
+        for (_, value) in stats.punchcard.clone(){
+            instance.punch_data.push(PunchesValue{
+                weekday: value.weekday,
+                hour: value.hour,
+                commits: value.commits
+            })
+        }
         return instance;
     }
 
@@ -93,20 +108,20 @@ impl GitStatsViewModel {
             value: stats.summary.date_first_commit.clone()
         });
         instance.summary.push(SummaryViewModel {
-            name: "Number of commits".to_string(),
+            name: "Number of commits_collection".to_string(),
             value: stats.summary.commit_count.to_string()
         });
         instance.summary.push(SummaryViewModel {
-            name: "Total lines added".to_string(),
+            name: "Total lines_collection added".to_string(),
             value: stats.summary.total_lines_added.to_string()
         });
         instance.summary.push(SummaryViewModel {
-            name: "Total lines deleted".to_string(),
+            name: "Total lines_collection deleted".to_string(),
             value: stats.summary.total_lines_deleted.to_string()
         });
 
         instance.summary.push(SummaryViewModel{
-            name: "Max number of lines in a commit message".to_string(),
+            name: "Max number of lines_collection in a commit message".to_string(),
             value: stats.message_stats.max_lines.to_string()
         });
 
@@ -116,7 +131,7 @@ impl GitStatsViewModel {
         });
 
         instance.summary.push(SummaryViewModel{
-            name: "Avg number of lines in a commit message".to_string(),
+            name: "Avg number of lines_collection in a commit message".to_string(),
             value: stats.message_stats.avg_lines.to_string()
         });
 
@@ -126,7 +141,7 @@ impl GitStatsViewModel {
         });
 
         instance.summary.push(SummaryViewModel{
-            name: "Total number of lines across all commit messages".to_string(),
+            name: "Total number of lines_collection across all commit messages".to_string(),
             value: stats.total_message_lines.to_string()
         });
 

@@ -1,5 +1,6 @@
+use chrono::{Datelike, Timelike};
 use crate::{GitCommit, GitStat, GitStats, LineStats};
-use crate::stats::FileStats;
+use crate::stats::{FileStats, PunchStats};
 
 struct SummaryStatsCollector {}
 
@@ -104,6 +105,21 @@ impl GitStat for SimilarFilesChangingCollector{
     }
 }
 
+struct PunchCardCollector{
+
+}
+
+impl GitStat for PunchCardCollector{
+    fn process(&self, commit: &GitCommit, stats: &mut GitStats) {
+        let stat = stats.punchcard.entry(commit.hour_key_by_weekday())
+            .or_insert(PunchStats {
+                weekday: commit.date.weekday().num_days_from_sunday(),
+                hour: commit.date.hour(),
+                commits: 0
+            });
+        stat.commits += 1
+    }
+}
 
 pub fn create_stat_collectors() -> Vec<Box<dyn GitStat>> {
     let stats_functions: Vec<Box<dyn GitStat>> = vec![
@@ -112,7 +128,8 @@ pub fn create_stat_collectors() -> Vec<Box<dyn GitStat>> {
         Box::new(TotalLinesByDayCollector {}),
         Box::new(MessageStatsCollector {}),
         //Box::new(SimilarFilesChangingCollector{}),
-        Box::new(TotalFilesByDayCollector{})
+        Box::new(TotalFilesByDayCollector{}),
+        Box::new(PunchCardCollector{})
     ];
     stats_functions
 }

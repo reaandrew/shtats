@@ -65,6 +65,10 @@ impl GitCommit {
         return self.date.format("%Y-%m-%d").to_string();
     }
 
+    pub(crate) fn hour_key_by_weekday(&self) -> String {
+        return self.date.format("%w-%H").to_string();
+    }
+
     pub(crate) fn total_lines_added(&self) -> i32 {
         return self.line_stats.iter().map(|x| x.lines_added).sum();
     }

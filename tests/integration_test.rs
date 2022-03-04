@@ -18,7 +18,7 @@ fn test_cli_report() {
         }, &|| {})?;
 
         assert!(reporter.to_string().contains("<tr>
-                    <td>Number of commits</td>
+                    <td>Number of commits_collection</td>
                     <td>3</td>
                 </tr>"));
 
