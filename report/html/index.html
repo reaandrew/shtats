@@ -22,7 +22,7 @@
         @import "./static/shtats.css";
     </style>
     <script>
-        //let summaries, total_commits_by_day_model, total_lines_by_day_model, total_files_by_day_model;
+        //let summaries, total_commits_by_day_model, total_lines_by_day_model, total_files_by_day_model, punch_data;
         const wait=!0;
     </script>
 </head>
@@ -32,14 +32,14 @@
     import {h, render} from 'preact';
     import Report from './components/report';
     import {Summary} from "./components/summary";
-    import Commits from "./components/commits";
-    import Lines from "./components/lines";
+    import CommitsCollection from "./components/commits_collection";
+    import LinesCollection from "./components/lines_collection";
     import Files from "./components/files";
 
     render(<Report>
         <Summary data={summaries}/>
-        <Commits data={total_commits_by_day_model} />
-        <Lines data={total_lines_by_day_model} />
+        <CommitsCollection data={total_commits_by_day_model}  punch_data={punch_data}/>
+        <LinesCollection data={total_lines_by_day_model} />
         <Files data={total_files_by_day_model} />
     </Report>, document.body);
 </script>

@@ -6,7 +6,7 @@ import LinesCumulative from "../lines_cumulative";
 import LinesAddedDeletedSummary from "../lines_added_deleted_summary";
 
 
-export default function Lines({data}) {
+export default function LinesCollection({data}) {
     return (
         <div>
             <div className="row">

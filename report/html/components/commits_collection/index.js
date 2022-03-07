@@ -5,8 +5,9 @@ import CommitsByDay from "../commits_by_day";
 import CommitsByWeekday from "../commits_by_weekday";
 import CommitsByMonth from "../commits_by_month";
 import CommitsCumulative from "../commits_cumulative";
+import CommitsByHour from "../commits_by_hour";
 
-export default function Commits({data}) {
+export default function CommitsCollection({data, punch_data}) {
     return (
         <div>
             <div className="row">
@@ -25,6 +26,11 @@ export default function Commits({data}) {
             <div className="row">
                 <div className="col">
                     <CommitsCumulative data={data}/>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col">
+                    <CommitsByHour data={punch_data} />
                 </div>
             </div>
         </div>

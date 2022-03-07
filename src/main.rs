@@ -79,13 +79,13 @@ fn get_app_matches() -> ArgMatches {
                 .long("until")
                 .allow_invalid_utf8(true)
                 .takes_value(true)
-                .help("gather stats on all commits until this date"),
+                .help("gather stats on all commits_collection until this date"),
         ).arg(
             Arg::new("since")
                 .long("since")
                 .allow_invalid_utf8(true)
                 .takes_value(true)
-                .help("gather stats on all commits since this date"),
+                .help("gather stats on all commits_collection since this date"),
         ).arg(
             Arg::new("output")
                 .short('o')

@@ -7,7 +7,6 @@ export default function LinesCumulative({data}){
     function rolling_sum_for_lines(data){
         return data.reduce((pre, cur, index) => {
             let val = pre[index-1] === undefined ? 0 : pre[index-1][1];
-            console.log('value', val);
             pre.push([cur[0],(cur[1]-cur[2])+val]);
             return pre;
         },[]);

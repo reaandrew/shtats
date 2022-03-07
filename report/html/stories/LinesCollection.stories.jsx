@@ -1,17 +1,17 @@
 /** @jsx h */
 import { h } from 'preact';
 
-import Lines from '../components/lines';
+import LinesCollection from '../components/lines_collection';
 import '../static/bootstrap.min.css';
 import '../static/shtats.css';
 import {generate_data} from "./utils";
 
 export default {
-    title: 'Shtats/Lines Combined',
-    component: Lines,
+    title: 'Shtats/Lines Collection',
+    component: LinesCollection,
 };
 
-const Template = (args) => <Lines {...args} />;
+const Template = (args) => <LinesCollection {...args} />;
 
 
 export const With30DaysOfData = Template.bind({});

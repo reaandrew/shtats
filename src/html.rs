@@ -29,7 +29,13 @@ const total_files_by_day_model = [
     {{#total_files_by_day}}
     [\"{{key}}\",{{files_added}},{{files_deleted}},{{files_modified}},{{files_renamed}}],
     {{/total_files_by_day}}
+        ];
+const punch_data = [
+    {{#punch_data}}
+    [{{weekday}},{{hour}},{{commits}}],
+    {{/punch_data}}
         ];";
+
         let template_content = self.template.replace("const wait=!0;",data_template);
         let tpl = Template::new(template_content).unwrap();
 

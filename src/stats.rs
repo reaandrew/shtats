@@ -45,6 +45,13 @@ pub struct MessageStats {
 }
 
 #[derive(Default, Clone, PartialEq)]
+pub struct PunchStats{
+    pub(crate) weekday: u32,
+    pub(crate) hour: u32,
+    pub(crate) commits: u32,
+}
+
+#[derive(Default, Clone, PartialEq)]
 pub struct GitStats {
     pub(crate) count: i32,
     pub(crate) summary: SummaryStats,
@@ -54,7 +61,8 @@ pub struct GitStats {
     pub(crate) total_message_lines: i32,
     pub(crate) total_message_size: i32,
     pub(crate) message_stats: MessageStats,
-    pub(crate) dup_detector: DuplicateDetector
+    pub(crate) dup_detector: DuplicateDetector,
+    pub(crate) punchcard: HashMap<String, PunchStats>
 }
 
 impl GitStats{
@@ -68,7 +76,8 @@ impl GitStats{
             total_message_lines: 0,
             total_message_size: 0,
             message_stats: Default::default(),
-            dup_detector: DuplicateDetector::new(threshold)
+            dup_detector: DuplicateDetector::new(threshold),
+            punchcard: Default::default()
         }
     }
 }
