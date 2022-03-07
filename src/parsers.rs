@@ -2,7 +2,7 @@ use std::io::{BufRead, BufReader};
 use std::process::ChildStdout;
 use std::str::FromStr;
 use chrono::DateTime;
-use crate::{GitStat, GitStats};
+use crate::{GitStat};
 use crate::models::{FileOperation, GitCommit, LineStat, Operation};
 use crate::process::process_commit;
 
@@ -67,7 +67,7 @@ fn parse_message(line: &String, commit: &mut GitCommit) {
 }
 
 // TODO: Change design to reduce number of arguments.
-pub(crate) fn parse_git_log(stats_functions: &Vec<Box<dyn GitStat>>, mut stats: &mut GitStats, stdout: ChildStdout, process_callback: &dyn Fn() -> ()) {
+pub(crate) fn parse_git_log(stats_functions: &mut Vec<Box<dyn GitStat>>, stdout: ChildStdout, process_callback: &dyn Fn() -> ()) {
     let mut reader = BufReader::new(stdout);
     let mut current: GitCommit = GitCommit::default();
     let mut s = String::new();
@@ -84,7 +84,7 @@ pub(crate) fn parse_git_log(stats_functions: &Vec<Box<dyn GitStat>>, mut stats: 
                 if start {
                     start = false;
                 } else {
-                    process_commit(&current, &stats_functions, &mut stats, process_callback);
+                    process_commit(&current, stats_functions, process_callback);
                 }
                 current = GitCommit::default();
                 parse_commit(&s, &mut current);
@@ -107,7 +107,7 @@ pub(crate) fn parse_git_log(stats_functions: &Vec<Box<dyn GitStat>>, mut stats: 
             }
         }
     }
-    process_commit(&current, &stats_functions, &mut stats, &||{});
+    process_commit(&current, stats_functions, &||{});
 }
 
 #[cfg(test)]

@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{Error, Write};
 use std::path::Path;
 use std::process::{ChildStdout, Command, Stdio};
-use crate::{create_stat_collectors, GitCommit, GitStat, GitStats, GitStatsViewModel, Reporter};
+use crate::{create_stat_collectors, GitCommit, GitStat, GitStatsViewModel, Reporter};
 use crate::parsers::parse_git_log;
 
 #[derive(Default)]
@@ -13,24 +13,25 @@ pub struct Config {
 }
 
 // TODO: Change design to reduce number of arguments.
-pub fn process_commit(commit: &GitCommit, stat_functions: &Vec<Box<dyn GitStat>>, stats: &mut GitStats, process_callback: &dyn Fn() -> ()) {
-    stats.count += 1;
-    for stat in stat_functions {
-        stat.process(commit, stats);
+pub fn process_commit(commit: &GitCommit, stat_functions: &mut Vec<Box<dyn GitStat>>, process_callback: &dyn Fn() -> ()) {
+    for stat in stat_functions{
+        stat.process(commit);
     }
     process_callback();
 }
 
 // TODO: Change design to reduce number of arguments.
 pub fn run_shtats(path: &Path, reporter: &mut dyn Reporter, config: Config, process_callback: &dyn Fn() -> ()) -> Result<(), Error> {
-    let stats_functions = create_stat_collectors();
-    let mut stats: GitStats = GitStats::new(10);
+    let mut stats_functions = create_stat_collectors();
     let args = create_git_log_args(&config);
     let stdout = execute_git(args, path);
 
-    parse_git_log(&stats_functions, &mut stats, stdout, process_callback);
+    parse_git_log(&mut stats_functions, stdout, process_callback);
 
-    let viewmodel = GitStatsViewModel::new(&stats.clone());
+    let mut viewmodel = GitStatsViewModel::default();
+    for stat in stats_functions.iter() {
+        stat.update(&mut viewmodel);
+    }
     reporter.write(viewmodel);
 
     let path = Path::new(&config.output);

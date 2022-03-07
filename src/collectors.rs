@@ -1,41 +1,111 @@
+use std::collections::HashMap;
+use bytesize::ByteSize;
 use chrono::{Datelike, Timelike};
-use crate::{GitCommit, GitStat, GitStats, LineStats};
-use crate::stats::{FileStats, PunchStats};
+use crate::{GitCommit, GitStat, GitStatsViewModel, LineStats};
+use crate::duplicates::DuplicateDetector;
+use crate::stats::{FileStats, MessageStats, PunchStats, SummaryStats};
+use crate::viewmodel::{FilesValue, KeyValue, LinesValue, PunchesValue, SummaryViewModel};
 
-struct SummaryStatsCollector {}
+struct SummaryStatsCollector {
+    pub(crate) summary: SummaryStats,
+}
 
-impl GitStat for SummaryStatsCollector {
-    fn process(&self, commit: &GitCommit, stats: &mut GitStats) {
-        stats.summary.commit_count += 1;
-
-        if stats.summary.date_first_commit.is_empty() {
-            stats.summary.date_first_commit = commit.date.to_string();
+impl SummaryStatsCollector{
+    fn default() -> Self{
+        Self{
+            summary: Default::default()
         }
-
-        if stats.summary.first_committer.is_empty() {
-            stats.summary.first_committer = String::from(&commit.author);
-        }
-
-        stats.summary.total_lines_added += commit.total_lines_added();
-        stats.summary.total_lines_deleted += commit.total_lines_deleted();
     }
 }
 
-struct TotalCommitsByDayCollector {}
+impl GitStat for SummaryStatsCollector {
+    fn process(&mut self, commit: &GitCommit) {
+        self.summary.commit_count += 1;
+
+        if self.summary.date_first_commit.is_empty() {
+            self.summary.date_first_commit = commit.date.to_string();
+        }
+
+        if self.summary.first_committer.is_empty() {
+            self.summary.first_committer = String::from(&commit.author);
+        }
+
+        self.summary.total_lines_added += commit.total_lines_added();
+        self.summary.total_lines_deleted += commit.total_lines_deleted();
+    }
+
+    fn update(&self, viewmodel: &mut GitStatsViewModel) {
+        viewmodel.summary.push(SummaryViewModel {
+            name: "First committer".to_string(),
+            value: self.summary.first_committer.clone()
+        });
+        viewmodel.summary.push(SummaryViewModel {
+            name: "Date of first commit".to_string(),
+            value: self.summary.date_first_commit.clone()
+        });
+        viewmodel.summary.push(SummaryViewModel {
+            name: "Number of commits_collection".to_string(),
+            value: self.summary.commit_count.to_string()
+        });
+        viewmodel.summary.push(SummaryViewModel {
+            name: "Total lines_collection added".to_string(),
+            value: self.summary.total_lines_added.to_string()
+        });
+        viewmodel.summary.push(SummaryViewModel {
+            name: "Total lines_collection deleted".to_string(),
+            value: self.summary.total_lines_deleted.to_string()
+        });
+
+
+
+    }
+}
+
+struct TotalCommitsByDayCollector {
+    total_commits_by_day: HashMap<String, i32>
+}
+
+impl TotalCommitsByDayCollector{
+    fn default() -> Self{
+        Self{
+            total_commits_by_day: Default::default()
+        }
+    }
+}
 
 impl GitStat for TotalCommitsByDayCollector {
-    fn process(&self, commit: &GitCommit, stats: &mut GitStats) {
-        let stat = stats.total_commits_by_day.entry(commit.day_key())
+    fn process(&mut self, commit: &GitCommit) {
+        let stat = self.total_commits_by_day.entry(commit.day_key())
             .or_insert(0);
         *stat += 1;
     }
+
+    fn update(&self, viewmodel: &mut GitStatsViewModel) {
+        for (key, value) in self.total_commits_by_day.clone() {
+            viewmodel.total_commits_by_day.push(KeyValue {
+                key,
+                value
+            })
+        }
+        viewmodel.total_commits_by_day.sort_by(|a, b| a.key.cmp(&b.key));
+    }
 }
 
-struct TotalLinesByDayCollector {}
+struct TotalLinesByDayCollector {
+    total_lines_by_day: HashMap<String, LineStats>
+}
+
+impl TotalLinesByDayCollector{
+    fn default() -> Self{
+        Self{
+            total_lines_by_day: Default::default()
+        }
+    }
+}
 
 impl GitStat for TotalLinesByDayCollector {
-    fn process(&self, commit: &GitCommit, stats: &mut GitStats) {
-        let stat = stats.total_lines_by_day.entry(commit.day_key())
+    fn process(&mut self, commit: &GitCommit) {
+        let stat = self.total_lines_by_day.entry(commit.day_key())
             .or_insert(LineStats {
                 added: 0,
                 deleted: 0,
@@ -43,13 +113,34 @@ impl GitStat for TotalLinesByDayCollector {
         stat.added += commit.total_lines_added();
         stat.deleted += commit.total_lines_deleted();
     }
+
+    fn update(&self, viewmodel: &mut GitStatsViewModel) {
+        for (key, value) in self.total_lines_by_day.clone(){
+            viewmodel.total_lines_by_day.push(LinesValue{
+                key,
+                lines_added: value.added,
+                lines_deleted: value.deleted
+            })
+        }
+        viewmodel.total_lines_by_day.sort_by(|a, b| a.key.cmp(&b.key));
+    }
 }
 
-struct TotalFilesByDayCollector{}
+struct TotalFilesByDayCollector{
+    total_files_by_day: HashMap<String, FileStats>
+}
+
+impl TotalFilesByDayCollector{
+    fn default() -> Self{
+        Self{
+            total_files_by_day: Default::default()
+        }
+    }
+}
 
 impl GitStat for TotalFilesByDayCollector{
-    fn process(&self, commit: &GitCommit, stats: &mut GitStats) {
-        let stat = stats.total_files_by_day.entry(commit.day_key())
+    fn process(&mut self, commit: &GitCommit) {
+        let stat = self.total_files_by_day.entry(commit.day_key())
             .or_insert(FileStats {
                 added: 0,
                 modified: 0,
@@ -61,57 +152,141 @@ impl GitStat for TotalFilesByDayCollector{
         stat.modified += commit.total_files_modified();
         stat.renamed += commit.total_files_renamed();
     }
+
+    fn update(&self, viewmodel: &mut GitStatsViewModel) {
+        for (key, value) in self.total_files_by_day.clone(){
+            viewmodel.total_files_by_day.push(FilesValue{
+                key,
+                files_added: value.added,
+                files_deleted: value.deleted,
+                files_modified: value.modified,
+                files_renamed: value.renamed
+            })
+        }
+        viewmodel.total_files_by_day.sort_by(|a, b| a.key.cmp(&b.key));
+    }
 }
 
-struct MessageStatsCollector {}
+struct MessageStatsCollector {
+    count: i32,
+    total_message_lines: i32,
+    total_message_size: i32,
+    message_stats: MessageStats,
+}
+
+
+impl MessageStatsCollector{
+    fn default() -> Self{
+        Self{
+            count: 0,
+            total_message_lines: 0,
+            total_message_size: 0,
+            message_stats: Default::default()
+        }
+    }
+}
 
 impl GitStat for MessageStatsCollector {
-    fn process(&self, commit: &GitCommit, stats: &mut GitStats) {
-        stats.total_message_lines += commit.total_message_lines();
-        stats.total_message_size += commit.total_message_size();
+    fn process(&mut self, commit: &GitCommit) {
+        self.count += 1;
+        self.total_message_lines += commit.total_message_lines();
+        self.total_message_size += commit.total_message_size();
 
-        if commit.total_message_size() > stats.message_stats.max_size {
-            stats.message_stats.max_size = commit.total_message_size()
+        if commit.total_message_size() > self.message_stats.max_size {
+            self.message_stats.max_size = commit.total_message_size()
         }
 
-        if commit.total_message_lines() > stats.message_stats.max_lines {
-            stats.message_stats.max_lines = commit.total_message_lines();
+        if commit.total_message_lines() > self.message_stats.max_lines {
+            self.message_stats.max_lines = commit.total_message_lines();
         }
 
-        if commit.total_message_size() <= stats.message_stats.min_size {
-            stats.message_stats.min_size = commit.total_message_size()
+        if commit.total_message_size() <= self.message_stats.min_size {
+            self.message_stats.min_size = commit.total_message_size()
         }
 
-        if commit.total_message_lines() <= stats.message_stats.min_lines {
-            stats.message_stats.min_lines = commit.total_message_lines();
+        if commit.total_message_lines() <= self.message_stats.min_lines {
+            self.message_stats.min_lines = commit.total_message_lines();
         }
 
-        stats.message_stats.avg_size = stats.total_message_size / stats.summary.commit_count;
-        stats.message_stats.avg_lines = stats.total_message_lines / stats.summary.commit_count
+        self.message_stats.avg_size = self.total_message_size / self.count;
+        self.message_stats.avg_lines = self.total_message_lines / self.count;
+    }
+
+    fn update(&self, viewmodel: &mut GitStatsViewModel) {
+        viewmodel.summary.push(SummaryViewModel{
+            name: "Total size of all commit messages".to_string(),
+            value: ByteSize(self.total_message_size as u64).to_string()
+        });
+
+        viewmodel.summary.push(SummaryViewModel{
+            name: "Total number of lines_collection across all commit messages".to_string(),
+            value: self.total_message_lines.to_string()
+        });
+
+        viewmodel.summary.push(SummaryViewModel{
+            name: "Max number of lines_collection in a commit message".to_string(),
+            value: self.message_stats.max_lines.to_string()
+        });
+
+        viewmodel.summary.push(SummaryViewModel{
+            name: "Max size of a commit message".to_string(),
+            value: ByteSize(self.message_stats.max_size as u64).to_string()
+        });
+
+        viewmodel.summary.push(SummaryViewModel{
+            name: "Avg number of lines_collection in a commit message".to_string(),
+            value: self.message_stats.avg_lines.to_string()
+        });
+
+        viewmodel.summary.push(SummaryViewModel{
+            name: "Avg size of a commit message".to_string(),
+            value: ByteSize(self.message_stats.avg_size as u64).to_string()
+        });
+
     }
 }
 
 struct SimilarFilesChangingCollector{
+    dup_detector: DuplicateDetector,
+}
 
+impl SimilarFilesChangingCollector{
+    fn _default() -> Self{
+        Self{
+            dup_detector: DuplicateDetector::new(10)
+        }
+    }
 }
 
 impl GitStat for SimilarFilesChangingCollector{
-    fn process(&self, commit: &GitCommit, stats: &mut GitStats) {
+    fn process(&mut self, commit: &GitCommit) {
         let files = commit.file_operations
             .iter()
             .map(|x|x.file.as_str())
             .collect::<Vec<&str>>();
-        stats.dup_detector.add(files);
+        self.dup_detector.add(files);
+    }
+
+    fn update(&self, _viewmodel: &mut GitStatsViewModel) {
+        // TODO: implement me
     }
 }
 
 struct PunchCardCollector{
+    punchcard: HashMap<String, PunchStats>
+}
 
+impl PunchCardCollector{
+    fn default() -> Self{
+        Self{
+            punchcard: HashMap::new()
+        }
+    }
 }
 
 impl GitStat for PunchCardCollector{
-    fn process(&self, commit: &GitCommit, stats: &mut GitStats) {
-        let stat = stats.punchcard.entry(commit.hour_key_by_weekday())
+    fn process(&mut self, commit: &GitCommit) {
+        let stat = self.punchcard.entry(commit.hour_key_by_weekday())
             .or_insert(PunchStats {
                 weekday: commit.date.weekday().num_days_from_sunday(),
                 hour: commit.date.hour(),
@@ -119,17 +294,27 @@ impl GitStat for PunchCardCollector{
             });
         stat.commits += 1
     }
+
+    fn update(&self, viewmodel: &mut GitStatsViewModel) {
+        for (_, value) in self.punchcard.clone(){
+            viewmodel.punch_data.push(PunchesValue{
+                weekday: value.weekday,
+                hour: value.hour,
+                commits: value.commits
+            })
+        }
+    }
 }
 
 pub fn create_stat_collectors() -> Vec<Box<dyn GitStat>> {
     let stats_functions: Vec<Box<dyn GitStat>> = vec![
-        Box::new(SummaryStatsCollector {}),
-        Box::new(TotalCommitsByDayCollector {}),
-        Box::new(TotalLinesByDayCollector {}),
-        Box::new(MessageStatsCollector {}),
-        //Box::new(SimilarFilesChangingCollector{}),
-        Box::new(TotalFilesByDayCollector{}),
-        Box::new(PunchCardCollector{})
+        Box::new(SummaryStatsCollector::default()),
+        Box::new(TotalCommitsByDayCollector::default()),
+        Box::new(TotalLinesByDayCollector::default()),
+        Box::new(MessageStatsCollector::default()),
+        //Box::new(SimilarFilesChangingCollector::default()),
+        Box::new(TotalFilesByDayCollector::default()),
+        Box::new(PunchCardCollector::default())
     ];
     stats_functions
 }

@@ -12,7 +12,7 @@ use viewmodel::{GitStatsViewModel};
 use crate::collectors::create_stat_collectors;
 use crate::models::GitCommit;
 use crate::output::{BufferedOutput};
-use crate::stats::{GitStat, GitStats, LineStats};
+use crate::stats::{GitStat, LineStats};
 
 
 pub trait Reporter {
