@@ -1,5 +1,4 @@
 use ramhorns::Template;
-use serde_json::json;
 use crate::{BufferedOutput, GitStatsJsonViewModel, Reporter};
 use ramhorns::Content;
 

@@ -2,10 +2,9 @@ use std::fs::File;
 use std::io::{Error, Write};
 use std::path::Path;
 use std::process::{ChildStdout, Command, Stdio};
-use serde_json::{json, Value};
+use serde_json::{ Value};
 use crate::{create_stat_collectors, GitCommit, GitStat, GitStatsJsonViewModel, Reporter};
 use crate::parsers::parse_git_log;
-use crate::stats::JsonValue;
 
 #[derive(Default)]
 pub struct Config {

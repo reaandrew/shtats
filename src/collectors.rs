@@ -1,12 +1,13 @@
 use std::collections::HashMap;
 use bytesize::ByteSize;
 use chrono::{Datelike, Timelike};
-use serde_json::{Error, Number, Value};
-use crate::{GitCommit, GitStat, GitStatsJsonViewModel, LineStats};
+use serde_json::{Error, Number};
+use crate::{GitCommit, GitStat, LineStats};
 use crate::duplicates::DuplicateDetector;
 use crate::stats::{FileStats, JsonValue, MessageStats, PunchStats, SummaryStats};
 use crate::viewmodel::{FilesValue, GitStatsJsonViewModelItem, KeyValue, LinesValue, PunchesValue, SummaryViewModelItem};
 
+#[derive(Clone)]
 struct SummaryStatsCollector {
     pub(crate) summary: SummaryStats,
 }
@@ -407,25 +408,20 @@ pub fn create_stat_collectors() -> Vec<Box<dyn GitStat>> {
 #[cfg(test)]
 mod summary_stats_collector_tests {
     use chrono::{DateTime, Duration, Utc};
-    use crate::{GitCommit, GitStat, GitStats};
+    use crate::{GitCommit, GitStat};
     use crate::collectors::SummaryStatsCollector;
     use crate::models::LineStat;
-    use crate::process::process_commit;
 
     #[test]
     fn test_overall_commit_count_with_1_commit() {
         let mut commit: GitCommit = GitCommit::default();
         commit.commit_hash = String::from("123");
 
-        let stat_functions: Vec<Box<dyn GitStat>> = vec![
-            Box::new(SummaryStatsCollector {})
-        ];
+        let mut collector = SummaryStatsCollector::default();
 
-        let mut stats: GitStats = Default::default();
+        collector.process(&commit);
 
-        process_commit(&commit, &stat_functions, &mut stats, &|| {});
-
-        assert_eq!(1, stats.summary.commit_count);
+        assert_eq!(1, collector.summary.commit_count);
     }
 
     #[test]
@@ -433,15 +429,11 @@ mod summary_stats_collector_tests {
         let mut commit: GitCommit = GitCommit::default();
         commit.date = DateTime::from(Utc::now());
 
-        let stat_functions: Vec<Box<dyn GitStat>> = vec![
-            Box::new(SummaryStatsCollector {})
-        ];
+        let mut collector = SummaryStatsCollector::default();
 
-        let mut stats: GitStats = Default::default();
+        collector.process(&commit);
 
-        process_commit(&commit, &stat_functions, &mut stats, &|| {});
-
-        assert_eq!(commit.date.to_string(), stats.summary.date_first_commit);
+        assert_eq!(commit.date.to_string(), collector.summary.date_first_commit);
     }
 
     #[test]
@@ -451,16 +443,10 @@ mod summary_stats_collector_tests {
         let mut commit_2: GitCommit = GitCommit::default();
         commit_2.date = DateTime::from(Utc::now());
 
-        let stat_functions: Vec<Box<dyn GitStat>> = vec![
-            Box::new(SummaryStatsCollector {})
-        ];
-
-        let mut stats: GitStats = Default::default();
-
-        process_commit(&commit_1, &stat_functions, &mut stats, &|| {});
-        process_commit(&commit_2, &stat_functions, &mut stats, &|| {});
-
-        assert_eq!(commit_1.date.to_string(), stats.summary.date_first_commit);
+        let mut collector = SummaryStatsCollector::default();
+        collector.process(&commit_1);
+        collector.process(&commit_2);
+        assert_eq!(commit_1.date.to_string(), collector.summary.date_first_commit);
     }
 
     #[test]
@@ -468,15 +454,10 @@ mod summary_stats_collector_tests {
         let mut commit: GitCommit = GitCommit::default();
         commit.author = String::from("Bob");
 
-        let stat_functions: Vec<Box<dyn GitStat>> = vec![
-            Box::new(SummaryStatsCollector {})
-        ];
+        let mut collector = SummaryStatsCollector::default();
+        collector.process(&commit);
 
-        let mut stats: GitStats = Default::default();
-
-        process_commit(&commit, &stat_functions, &mut stats, &|| {});
-
-        assert_eq!(stats.summary.first_committer, "Bob");
+        assert_eq!(collector.summary.first_committer, "Bob");
     }
 
     #[test]
@@ -486,16 +467,10 @@ mod summary_stats_collector_tests {
         let mut commit_2: GitCommit = GitCommit::default();
         commit_2.author = String::from("Alan");
 
-        let stat_functions: Vec<Box<dyn GitStat>> = vec![
-            Box::new(SummaryStatsCollector {})
-        ];
+        let mut collector = SummaryStatsCollector::default();
+        collector.process(&commit_1);
 
-        let mut stats: GitStats = Default::default();
-
-        process_commit(&commit_1, &stat_functions, &mut stats, &|| {});
-        process_commit(&commit_2, &stat_functions, &mut stats, &|| {});
-
-        assert_eq!(stats.summary.first_committer, "Jeff");
+        assert_eq!(collector.summary.first_committer, "Jeff");
     }
 
     #[test]
@@ -506,15 +481,10 @@ mod summary_stats_collector_tests {
             lines_deleted: 0,
         }];
 
-        let stat_functions: Vec<Box<dyn GitStat>> = vec![
-            Box::new(SummaryStatsCollector {})
-        ];
+        let mut collector = SummaryStatsCollector::default();
+        collector.process(&commit);
 
-        let mut stats: GitStats = Default::default();
-
-        process_commit(&commit, &stat_functions, &mut stats, &|| {});
-
-        assert_eq!(stats.summary.total_lines_added, 10);
+        assert_eq!(collector.summary.total_lines_added, 10);
     }
 
     #[test]
@@ -530,18 +500,12 @@ mod summary_stats_collector_tests {
             lines_added: 5,
             lines_deleted: 0,
         }];
-
-        let stat_functions: Vec<Box<dyn GitStat>> = vec![
-            Box::new(SummaryStatsCollector {})
-        ];
-
-        let mut stats: GitStats = Default::default();
-
-        process_commit(&commit_1, &stat_functions, &mut stats, &|| {});
-        process_commit(&commit_2, &stat_functions, &mut stats, &|| {});
+        let mut collector = SummaryStatsCollector::default();
+        collector.process(&commit_1);
+        collector.process(&commit_2);
 
 
-        assert_eq!(stats.summary.total_lines_added, 15);
+        assert_eq!(collector.summary.total_lines_added, 15);
     }
 
     #[test]
@@ -552,15 +516,10 @@ mod summary_stats_collector_tests {
             lines_deleted: 2,
         }];
 
-        let stat_functions: Vec<Box<dyn GitStat>> = vec![
-            Box::new(SummaryStatsCollector {})
-        ];
+        let mut collector = SummaryStatsCollector::default();
+        collector.process(&commit);
 
-        let mut stats: GitStats = Default::default();
-
-        process_commit(&commit, &stat_functions, &mut stats, &|| {});
-
-        assert_eq!(stats.summary.total_lines_deleted, 2);
+        assert_eq!(collector.summary.total_lines_deleted, 2);
     }
 
     #[test]
@@ -577,16 +536,10 @@ mod summary_stats_collector_tests {
             lines_deleted: 7,
         }];
 
-        let stat_functions: Vec<Box<dyn GitStat>> = vec![
-            Box::new(SummaryStatsCollector {})
-        ];
+        let mut collector = SummaryStatsCollector::default();
+        collector.process(&commit_1);
+        collector.process(&commit_2);
 
-        let mut stats: GitStats = Default::default();
-
-        process_commit(&commit_1, &stat_functions, &mut stats, &|| {});
-        process_commit(&commit_2, &stat_functions, &mut stats, &|| {});
-
-
-        assert_eq!(stats.summary.total_lines_deleted, 9);
+        assert_eq!(collector.summary.total_lines_deleted, 9);
     }
 }
