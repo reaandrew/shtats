@@ -1,11 +1,14 @@
-use std::collections::HashMap;
+use serde_json::{Error};
 use crate::{GitCommit};
-use crate::duplicates::DuplicateDetector;
+use crate::viewmodel::GitStatsJsonViewModelItem;
 
-pub trait GitStat {
-    fn process(&self, commit: &GitCommit, stats: &mut GitStats);
+pub trait JsonValue{
+    fn get_json_viewmodel(&self) -> Result<GitStatsJsonViewModelItem, Error>;
 }
 
+pub trait GitStat : JsonValue{
+    fn process(&mut self, commit: &GitCommit);
+}
 
 #[derive(Default, Clone, PartialEq)]
 pub struct SummaryStats {
@@ -49,35 +52,4 @@ pub struct PunchStats{
     pub(crate) weekday: u32,
     pub(crate) hour: u32,
     pub(crate) commits: u32,
-}
-
-#[derive(Default, Clone, PartialEq)]
-pub struct GitStats {
-    pub(crate) count: i32,
-    pub(crate) summary: SummaryStats,
-    pub(crate) total_commits_by_day: HashMap<String, i32>,
-    pub(crate) total_lines_by_day: HashMap<String, LineStats>,
-    pub(crate) total_files_by_day: HashMap<String, FileStats>,
-    pub(crate) total_message_lines: i32,
-    pub(crate) total_message_size: i32,
-    pub(crate) message_stats: MessageStats,
-    pub(crate) dup_detector: DuplicateDetector,
-    pub(crate) punchcard: HashMap<String, PunchStats>
-}
-
-impl GitStats{
-    pub(crate) fn new(threshold: i32) -> Self {
-        return GitStats{
-            count: 0,
-            summary: Default::default(),
-            total_commits_by_day: Default::default(),
-            total_lines_by_day: Default::default(),
-            total_files_by_day: Default::default(),
-            total_message_lines: 0,
-            total_message_size: 0,
-            message_stats: Default::default(),
-            dup_detector: DuplicateDetector::new(threshold),
-            punchcard: Default::default()
-        }
-    }
 }

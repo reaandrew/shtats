@@ -18,12 +18,12 @@
     <style>
         @import "./static/bootstrap.min.css";
     </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-print-css/css/bootstrap-print.min.css" media="print">
     <style>
         @import "./static/shtats.css";
     </style>
     <script>
-        //let summaries, total_commits_by_day_model, total_lines_by_day_model, total_files_by_day_model, punch_data;
-        const wait=!0;
+        const viewmodel=null;
     </script>
 </head>
 <body>
@@ -37,10 +37,10 @@
     import Files from "./components/files";
 
     render(<Report>
-        <Summary data={summaries}/>
-        <CommitsCollection data={total_commits_by_day_model}  punch_data={punch_data}/>
-        <LinesCollection data={total_lines_by_day_model} />
-        <Files data={total_files_by_day_model} />
+        <Summary data={viewmodel.summary}/>
+        <CommitsCollection data={viewmodel.data.total_commits_by_day}  punch_data={viewmodel.data.punch_data}/>
+        <LinesCollection data={viewmodel.data.total_lines_by_day} />
+        <Files data={viewmodel.data.total_files_by_day} />
     </Report>, document.body);
 </script>
 </body>
