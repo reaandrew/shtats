@@ -4,8 +4,8 @@ export function Summary({data}) {
 
     let items = (data.map(x => (
         <tr>
-            <td>{x[0]}</td>
-            <td>{x[1]}</td>
+            <td>{x.name}</td>
+            <td>{x.value}</td>
         </tr>
     )));
     return (

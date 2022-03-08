@@ -2,8 +2,10 @@ use std::fs::File;
 use std::io::{Error, Write};
 use std::path::Path;
 use std::process::{ChildStdout, Command, Stdio};
-use crate::{create_stat_collectors, GitCommit, GitStat, GitStatsViewModel, Reporter};
+use serde_json::{json, Value};
+use crate::{create_stat_collectors, GitCommit, GitStat, GitStatsJsonViewModel, Reporter};
 use crate::parsers::parse_git_log;
+use crate::stats::JsonValue;
 
 #[derive(Default)]
 pub struct Config {
@@ -28,9 +30,15 @@ pub fn run_shtats(path: &Path, reporter: &mut dyn Reporter, config: Config, proc
 
     parse_git_log(&mut stats_functions, stdout, process_callback);
 
-    let mut viewmodel = GitStatsViewModel::default();
+    let mut viewmodel = GitStatsJsonViewModel::default();
     for stat in stats_functions.iter() {
-        stat.update(&mut viewmodel);
+        let json_viewmodel = stat.get_json_viewmodel().unwrap();
+        let summaries = json_viewmodel.summary.iter()
+            .map(|x| {
+                return serde_json::to_value(x).unwrap();
+            }).collect::<Vec<Value>>();
+        viewmodel.summary.extend(summaries);
+        viewmodel.data.insert(json_viewmodel.key, json_viewmodel.data);
     }
     reporter.write(viewmodel);
 

@@ -1,5 +1,7 @@
 use ramhorns::Template;
-use crate::{BufferedOutput, GitStatsViewModel, Reporter};
+use serde_json::json;
+use crate::{BufferedOutput, GitStatsJsonViewModel, Reporter};
+use ramhorns::Content;
 
 #[derive(Clone)]
 pub struct HtmlReporter {
@@ -7,39 +9,21 @@ pub struct HtmlReporter {
     output: BufferedOutput
 }
 
-impl Reporter for HtmlReporter {
-    fn write(&mut self, stats: GitStatsViewModel) {
-        let data_template="
-const summaries = [
-{{#summary}}
-[\"{{name}}\",\"{{value}}\"],
-{{/summary}}
-];
-const total_commits_by_day_model = [
-    {{#total_commits_by_day}}
-        [\"{{key}}\",{{value}}],
-    {{/total_commits_by_day}}
-];
-const total_lines_by_day_model = [
-    {{#total_lines_by_day}}
-    [\"{{key}}\",{{lines_added}},{{lines_deleted}}],
-    {{/total_lines_by_day}}
-        ];
-const total_files_by_day_model = [
-    {{#total_files_by_day}}
-    [\"{{key}}\",{{files_added}},{{files_deleted}},{{files_modified}},{{files_renamed}}],
-    {{/total_files_by_day}}
-        ];
-const punch_data = [
-    {{#punch_data}}
-    [{{weekday}},{{hour}},{{commits}}],
-    {{/punch_data}}
-        ];";
+#[derive(Content)]
+struct Context{
+    pub data: String
+}
 
-        let template_content = self.template.replace("const wait=!0;",data_template);
+impl Reporter for HtmlReporter {
+    fn write(&mut self, stats: GitStatsJsonViewModel) {
+        let data_template="const viewmodel = {{{data}}}";
+
+        let json_value = serde_json::to_string(&stats).unwrap();
+        let template_content = self.template.replace("const viewmodel = null;",data_template)
+            .replace("const viewmodel=null;",data_template);
         let tpl = Template::new(template_content).unwrap();
 
-        let rendered = tpl.render(&stats);
+        let rendered = tpl.render(&Context{data: json_value});
 
         self.output.write(rendered);
     }

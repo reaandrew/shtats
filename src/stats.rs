@@ -1,10 +1,14 @@
-use crate::{GitCommit, GitStatsViewModel};
+use serde_json::{Error, Value};
+use crate::{GitCommit, GitStatsJsonViewModel};
+use crate::viewmodel::GitStatsJsonViewModelItem;
 
-pub trait GitStat {
-    fn process(&mut self, commit: &GitCommit);
-    fn update(&self, viewmodel: &mut GitStatsViewModel);
+pub trait JsonValue{
+    fn get_json_viewmodel(&self) -> Result<GitStatsJsonViewModelItem, Error>;
 }
 
+pub trait GitStat : JsonValue{
+    fn process(&mut self, commit: &GitCommit);
+}
 
 #[derive(Default, Clone, PartialEq)]
 pub struct SummaryStats {
