@@ -1,12 +1,12 @@
 use std::collections::HashMap;
-use itertools::{min};
-use serde_json::{Error};
+use itertools::{max, min};
+use serde_json::{Error, json};
 use crate::{GitCommit, GitStat};
 use crate::stats::JsonValue;
 use crate::viewmodel::{GitStatsJsonViewModelItem, SummaryViewModelItem};
 
 const LOWEST_COMMIT_NUMBER_NAME: &str = "Lowest number of commits for a file";
-//const HIGHEST_COMMIT_NUMBER_NAME: &str = "Highest number of commits for a file";
+const HIGHEST_COMMIT_NUMBER_NAME: &str = "Highest number of commits for a file";
 
 pub struct FilesByCommitsCollector {
     total_commits: i32,
@@ -26,15 +26,30 @@ impl FilesByCommitsCollector {
 impl JsonValue for FilesByCommitsCollector {
     fn get_json_viewmodel(&self) -> Result<GitStatsJsonViewModelItem, Error> {
         let lowest_commits = min(self.data.values()).unwrap();
-        //let highest_commits = max(self.data.values()).unwrap();
+        let highest_commits = max(self.data.values()).unwrap();
+
+        let lowest_items = serde_json::Value::Array(files_with_lowest_commits.iter().map(|x| {
+            return serde_json::Value::String(String::from(x))
+        }).collect::<Vec<serde_json::Value>>());
+
+        let highest_items = serde_json::Value::Array(files_with_highest_commits.iter().map(|x| {
+            return serde_json::Value::String(String::from(x))
+        }).collect::<Vec<serde_json::Value>>());
+
+        let object = json!({
+            "lowest_number_of_commits": lowest_commits,
+            "with_lowest_commits": lowest_items,
+            "highest_number_of_commits": highest_commits,
+            "with_highest_commits": highest_items
+        });
 
         Ok(GitStatsJsonViewModelItem {
             summary: vec![
                 SummaryViewModelItem { name: LOWEST_COMMIT_NUMBER_NAME.to_string(), value: lowest_commits.to_string() },
-                //SummaryViewModelItem { name: HIGHEST_COMMIT_NUMBER_NAME.to_string(), value: highest_commits.to_string() }
+                SummaryViewModelItem { name: HIGHEST_COMMIT_NUMBER_NAME.to_string(), value: highest_commits.to_string() }
             ],
             key: "files_by_commits".to_string(),
-            data: Default::default()
+            data: serde_json::to_value(object).unwrap(),
         })
     }
 }
