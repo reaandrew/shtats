@@ -1,4 +1,5 @@
 use crate::collectors::commits_by_day::CommitsByDayCollector;
+use crate::collectors::files_by_commits::FilesByCommitsCollector;
 use crate::collectors::files_by_day::FilesByDayCollector;
 use crate::collectors::lines_by_day::LinesByDayCollector;
 use crate::collectors::messages::MessagesCollector;
@@ -13,6 +14,7 @@ pub mod files_by_day;
 pub mod messages;
 pub mod similar_files;
 pub mod punch_card;
+pub mod files_by_commits;
 
 pub fn create_stat_collectors() -> Vec<Box<dyn GitStat>> {
     let stats_functions: Vec<Box<dyn GitStat>> = vec![
@@ -23,6 +25,7 @@ pub fn create_stat_collectors() -> Vec<Box<dyn GitStat>> {
         //Box::new(SimilarFilesChangingCollector::default()),
         Box::new(FilesByDayCollector::default()),
         Box::new(PunchCardCollector::default()),
+        Box::new(FilesByCommitsCollector::default())
     ];
     stats_functions
 }
