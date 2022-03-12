@@ -116,10 +116,12 @@ mod commit_tests {
         commit.line_stats.push(LineStat {
             lines_added: 1,
             lines_deleted: 2,
+            file: "".to_string()
         });
         commit.line_stats.push(LineStat {
             lines_added: 4,
             lines_deleted: 6,
+            file: "".to_string()
         });
         assert_eq!(5, commit.total_lines_added());
         assert_eq!(8, commit.total_lines_deleted());

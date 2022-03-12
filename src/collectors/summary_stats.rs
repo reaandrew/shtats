@@ -139,6 +139,7 @@ mod summary_stats_collector_tests {
         commit.line_stats = vec![LineStat {
             lines_added: 10,
             lines_deleted: 0,
+            file: "".to_string()
         }];
 
         let mut collector = SummaryStatsCollector::default();
@@ -153,12 +154,14 @@ mod summary_stats_collector_tests {
         commit_1.line_stats = vec![LineStat {
             lines_added: 10,
             lines_deleted: 0,
+            file: "".to_string()
         }];
 
         let mut commit_2: GitCommit = GitCommit::default();
         commit_2.line_stats = vec![LineStat {
             lines_added: 5,
             lines_deleted: 0,
+            file: "".to_string()
         }];
         let mut collector = SummaryStatsCollector::default();
         collector.process(&commit_1);
@@ -174,6 +177,7 @@ mod summary_stats_collector_tests {
         commit.line_stats = vec![LineStat {
             lines_added: 0,
             lines_deleted: 2,
+            file: "".to_string()
         }];
 
         let mut collector = SummaryStatsCollector::default();
@@ -188,12 +192,14 @@ mod summary_stats_collector_tests {
         commit_1.line_stats = vec![LineStat {
             lines_added: 0,
             lines_deleted: 2,
+            file: "".to_string()
         }];
 
         let mut commit_2: GitCommit = GitCommit::default();
         commit_2.line_stats = vec![LineStat {
             lines_added: 0,
             lines_deleted: 7,
+            file: "".to_string()
         }];
 
         let mut collector = SummaryStatsCollector::default();

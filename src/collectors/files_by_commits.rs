@@ -98,7 +98,7 @@ impl GitStat for FilesByCommitsCollector {
 
 #[cfg(test)]
 mod tests {
-    use crate::collectors::files_by_commits::{FilesByCommitsCollector, LOWEST_COMMIT_NUMBER_NAME};
+    use crate::collectors::files_by_commits::{FilesByCommitsCollector, HIGHEST_COMMIT_NUMBER_NAME, LOWEST_COMMIT_NUMBER_NAME};
     use crate::{GitCommit, GitStat};
     use crate::models::{FileOperation, Operation};
     use crate::stats::JsonValue;
@@ -113,7 +113,7 @@ mod tests {
         ];
         for mut commit in commits {
             commit.file_operations = vec![
-                FileOperation { op: Operation::ADD, file: "file".to_string() }
+                FileOperation { op: Operation::ADD, file: "file".to_string(), file_extension: "".to_string() }
             ];
             collector.process(&commit);
         }
@@ -126,20 +126,22 @@ mod tests {
         let mut collector = FilesByCommitsCollector::default();
         let mut commit1 = GitCommit::default();
         commit1.file_operations = vec![
-            FileOperation { op: Operation::ADD, file: "file1".to_string() },
-            FileOperation { op: Operation::ADD, file: "file2".to_string() },
+            FileOperation { op: Operation::ADD, file: "file1".to_string(), file_extension: "".to_string() },
+            FileOperation { op: Operation::ADD, file: "file2".to_string(), file_extension: "".to_string() },
         ];
         collector.process(&commit1);
 
         let mut commit2 = GitCommit::default();
         commit2.file_operations = vec![
-            FileOperation { op: Operation::MODIFY, file: "file2".to_string() }
+            FileOperation { op: Operation::MODIFY, file: "file2".to_string(), file_extension: "".to_string() }
         ];
         collector.process(&commit2);
 
         let result = collector.get_json_viewmodel().unwrap();
-        assert_eq!(1, result.summary.len());
+        assert_eq!(2, result.summary.len());
         assert_eq!(LOWEST_COMMIT_NUMBER_NAME.to_string(), result.summary.get(0).unwrap().name);
         assert_eq!("1 (1 file)", result.summary.get(0).unwrap().value);
+        assert_eq!(HIGHEST_COMMIT_NUMBER_NAME.to_string(), result.summary.get(1).unwrap().name);
+        assert_eq!("2 (1 file)", result.summary.get(1).unwrap().value);
     }
 }
