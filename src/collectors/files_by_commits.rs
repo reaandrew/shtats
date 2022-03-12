@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use itertools::{max, min};
-use serde_json::{Error, json};
+use serde_json::{Error};
 use crate::{GitCommit, GitStat};
 use crate::stats::JsonValue;
 use crate::viewmodel::{GitStatsJsonViewModelItem, SummaryViewModelItem};
@@ -21,35 +21,65 @@ impl FilesByCommitsCollector {
             data: Default::default(),
         }
     }
+
+    fn get_lowest_commits(&self) -> &i32 {
+        let lowest_commits = min(self.data.values()).unwrap();
+        lowest_commits
+    }
+
+    fn count_files_with_commits(&self, count: &i32) -> usize {
+        let files_with_lowest_commits = (self.data.clone()).into_iter()
+            .filter(|(_path, commit_count)| commit_count == count).count();
+        files_with_lowest_commits
+    }
+
+    fn get_highest_commits(&self) -> &i32 {
+        let highest_commits = max(self.data.values()).unwrap();
+        highest_commits
+    }
 }
 
 impl JsonValue for FilesByCommitsCollector {
     fn get_json_viewmodel(&self) -> Result<GitStatsJsonViewModelItem, Error> {
-        let lowest_commits = min(self.data.values()).unwrap();
-        let highest_commits = max(self.data.values()).unwrap();
+        let lowest_commits = self.get_lowest_commits();
+        let files_with_lowest_commits = self.count_files_with_commits(lowest_commits);
+        let highest_commits = self.get_highest_commits();
+        let files_with_highest_commits =self.count_files_with_commits(highest_commits);
 
-        let lowest_items = serde_json::Value::Array(files_with_lowest_commits.iter().map(|x| {
-            return serde_json::Value::String(String::from(x))
-        }).collect::<Vec<serde_json::Value>>());
+        // let object = json!({
+        //     "lowest_number_of_commits": lowest_commits,
+        //     "with_lowest_commits": lowest_items,
+        //     "highest_number_of_commits": highest_commits,
+        //     "with_highest_commits": highest_items
+        // });
 
-        let highest_items = serde_json::Value::Array(files_with_highest_commits.iter().map(|x| {
-            return serde_json::Value::String(String::from(x))
-        }).collect::<Vec<serde_json::Value>>());
-
-        let object = json!({
-            "lowest_number_of_commits": lowest_commits,
-            "with_lowest_commits": lowest_items,
-            "highest_number_of_commits": highest_commits,
-            "with_highest_commits": highest_items
-        });
+        let pluralize = |value:String, input: usize|->String{
+            return if input > 1 {
+                format!("{}s", value)
+            } else {
+                value
+            }
+        };
 
         Ok(GitStatsJsonViewModelItem {
             summary: vec![
-                SummaryViewModelItem { name: LOWEST_COMMIT_NUMBER_NAME.to_string(), value: lowest_commits.to_string() },
-                SummaryViewModelItem { name: HIGHEST_COMMIT_NUMBER_NAME.to_string(), value: highest_commits.to_string() }
+                SummaryViewModelItem {
+                    name: LOWEST_COMMIT_NUMBER_NAME.to_string(),
+                    value: format!("{} ({} {})",
+                                   lowest_commits.to_string(),
+                                   files_with_lowest_commits,
+                    pluralize(String::from("file"), files_with_lowest_commits)),
+                },
+                SummaryViewModelItem {
+                    name: HIGHEST_COMMIT_NUMBER_NAME.to_string(),
+                    value: format!("{} ({} {})",
+                                   highest_commits.to_string(),
+                                   files_with_highest_commits,
+                                   pluralize(String::from("file"), files_with_highest_commits)),
+                },
             ],
             key: "files_by_commits".to_string(),
-            data: serde_json::to_value(object).unwrap(),
+            data: Default::default(),
         })
     }
 }
@@ -110,6 +140,6 @@ mod tests {
         let result = collector.get_json_viewmodel().unwrap();
         assert_eq!(1, result.summary.len());
         assert_eq!(LOWEST_COMMIT_NUMBER_NAME.to_string(), result.summary.get(0).unwrap().name);
-        assert_eq!("1", result.summary.get(0).unwrap().value);
+        assert_eq!("1 (1 file)", result.summary.get(0).unwrap().value);
     }
 }

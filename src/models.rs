@@ -29,12 +29,14 @@ impl FromStr for Operation {
 pub(crate) struct LineStat {
     pub(crate) lines_added: i32,
     pub(crate) lines_deleted: i32,
+    pub(crate) file: String,
 }
 
 #[derive(Clone, PartialEq)]
 pub(crate) struct FileOperation {
     pub(crate) op: Operation,
     pub(crate) file: String,
+    pub(crate) file_extension: String,
 }
 
 #[derive(Clone, PartialEq)]
@@ -85,23 +87,22 @@ impl GitCommit {
         return self.message.len() as i32;
     }
 
-    pub (crate) fn total_files_added(&self) -> i32{
+    pub(crate) fn total_files_added(&self) -> i32 {
         return self.file_operations.iter().filter(|x| x.op == ADD).count() as i32;
     }
 
-    pub (crate) fn total_files_deleted(&self) -> i32{
-        return self.file_operations.iter().filter(|x|x.op == DELETE).count() as i32;
+    pub(crate) fn total_files_deleted(&self) -> i32 {
+        return self.file_operations.iter().filter(|x| x.op == DELETE).count() as i32;
     }
 
-    pub (crate) fn total_files_modified(&self) -> i32{
-        return self.file_operations.iter().filter(|x|x.op == MODIFY).count() as i32;
+    pub(crate) fn total_files_modified(&self) -> i32 {
+        return self.file_operations.iter().filter(|x| x.op == MODIFY).count() as i32;
     }
 
-    pub (crate) fn total_files_renamed(&self) -> i32{
-        return self.file_operations.iter().filter(|x|x.op == RENAME).count() as i32;
+    pub(crate) fn total_files_renamed(&self) -> i32 {
+        return self.file_operations.iter().filter(|x| x.op == RENAME).count() as i32;
     }
 }
-
 
 
 #[cfg(test)]

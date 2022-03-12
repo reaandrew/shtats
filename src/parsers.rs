@@ -1,4 +1,6 @@
+use std::ffi::OsStr;
 use std::io::{BufRead, BufReader};
+use std::path::Path;
 use std::process::ChildStdout;
 use std::str::FromStr;
 use chrono::DateTime;
@@ -43,9 +45,16 @@ fn parse_file_operation(line: &String, commit: &mut GitCommit) {
 
     let file_value = items[1].trim();
 
+    let filename = file_value;
+
+    let extension = String::from(Path::new(filename)
+        .extension()
+        .and_then(OsStr::to_str).unwrap_or(""));
+
     commit.file_operations.push(FileOperation {
         op: operation,
-        file: String::from(file_value),
+        file: String::from(filename),
+        file_extension: extension
     });
 }
 
@@ -54,10 +63,12 @@ fn parse_line_stats(line: &String, commit: &mut GitCommit) {
     let mut raw = line.split_whitespace();
     let lines_added_raw = String::from(raw.next().expect("failed to split lines added"));
     let lines_deleted_raw = String::from(raw.next().expect("failed to split lines deleted"));
+    let file = String::from(raw.next().expect("failed to split file name for line stats"));
 
     commit.line_stats.push(LineStat {
         lines_added: lines_added_raw.trim().parse().expect("err parsing lines added"),
         lines_deleted: lines_deleted_raw.trim().parse().expect("error parsing lines deleted"),
+        file,
     });
 }
 
@@ -107,7 +118,7 @@ pub(crate) fn parse_git_log(stats_functions: &mut Vec<Box<dyn GitStat>>, stdout:
             }
         }
     }
-    process_commit(&current, stats_functions, &||{});
+    process_commit(&current, stats_functions, &|| {});
 }
 
 #[cfg(test)]

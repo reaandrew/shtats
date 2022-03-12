@@ -1,12 +1,49 @@
-html{
+body {
+    font-family: 'Open Sans', sans-serif;
+}
+h3, h4, h5, h6{
     font-family: 'Roboto', sans-serif;
+    font-weight: bolder!important;
 }
-h1{
-    font-family: 'Bangers', cursive;
+h4, h5, h6{
+    font-family: 'Roboto', sans-serif;
+    font-weight:normal!important;
 }
-h2{
-    font-family: 'Shadows Into Light', cursive;
+h1, h2,  a {
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
 }
-h3{
-    font-family: 'Passion One', cursive;
+.navbar h1{
+    color: white;
+}
+
+.navbar a{
+    color: white!important;
+}
+.navbar a:active{
+    color: white!important;
+}
+
+.navbar{
+    background-color: #2DA1EF!important;
+}
+
+.navbar-custom {
+    background-color: #2DA1EF;
+}
+
+.navbar-custom .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0,0,0, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='2' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+}
+
+.navbar-custom.navbar-toggler {
+    border:none;
+}
+.navbar-custom .navbar-brand,
+.navbar-custom .navbar-text {
+    color: black;
+}
+
+.definition{
+    font-weight: bold;
 }
