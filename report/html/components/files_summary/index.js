@@ -38,8 +38,8 @@ export default function FilesSummary({data}){
                     data: [
                         {value: data.added, name: 'Added'},
                         {value: data.deleted, name: 'Deleted'},
-                        {value: data.added, name: 'Modified'},
-                        {value: data.deleted, name: 'Renamed'},
+                        {value: data.modified, name: 'Modified'},
+                        {value: data.renamed, name: 'Renamed'},
                     ],
                     emphasis: {
                         itemStyle: {

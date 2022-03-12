@@ -45,59 +45,49 @@
             </div>
         </div>
     </nav>
-    <div class="row">
-        <div class="col-md-9 col-lg-9 col-sm-12 col-xs-12">
+    <div class="row mt-4">
+        <div class="col">
+            <h2>USAGE</h2>
+            <code>
+                shtats run [OPTIONS]
+            </code>
+            <h3>OPTIONS</h3>
             <div class="row">
+                <div class="col-3">
+                    <code>-h, --help</code>
+                </div>
                 <div class="col">
-                    <div class="jumbotron mt-4">
-                        <h1 class="display-4">Get stats from your git repository</h1>
-                        <p class="lead">Gather lots of different stats about a repository to give you quick insight into
-                            the activity.</p>
-                        <hr class="my-4">
-                        <p>This tool has been developed in rust and uses preact and echarts for the report.</p>
-                        <p class="lead">
-                            <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
-                        </p>
-                    </div>
+                    Print the help information
                 </div>
             </div>
-            <div class="row mt-4 pt-4">
+            <div class="row">
+                <div class="col-3">
+                    <code>-o, --output</code>
+                </div>
                 <div class="col">
-                    <h3>Download</h3>
+                    Output filename to write the report to [default: report.html]
                 </div>
             </div>
-            <div class="row mt-4">
-                <div class="col">
-                    <div class="row">
-                        <div class="col text-center"><i class="fa fa-linux fa-6x"></i></div>
-                    </div>
-                    <div class="row">
-                        <div class="col text-center"><a href="/">Download for Linux</a></div>
-                    </div>
+            <div class="row">
+                <div class="col-3">
+                    <code>--since</code>
                 </div>
                 <div class="col">
-                    <div class="row">
-                        <div class="col text-center"><i class="fa fa-windows fa-6x"></i></div>
-                    </div>
-                    <div class="row">
-                        <div class="col text-center"><a href="/">Download for Windows</a></div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="row">
-                        <div class="col text-center"><i class="fa fa-apple fa-6x"></i></div>
-                    </div>
-                    <div class="row">
-                        <div class="col text-center"><a href="/">Download for Mac</a></div>
-                    </div>
+                    Gather stats on all commits since this date. (Same date formatting at git <a href="https://git-scm.com/docs/git-log#Documentation/git-log.txt-codegitlog--since2weeksago--gitkcode">see here</a>)
                 </div>
             </div>
-        </div>
-        <div class="col-md-3 col-lg-3 col-sm-12 col-xs-12 text-center">
-            <img src="images/shtats_thumbnail.png" class="img-fluid mt-4"/>
+            <div class="row">
+                <div class="col-3">
+                    <code>--until</code>
+                </div>
+                <div class="col">
+                    Gather stats on all commits until this date. (Same date formatting at git <a href="https://git-scm.com/docs/git-log#Documentation/git-log.txt-codegitlog--since2weeksago--gitkcode">see here</a>)
+                </div>
+            </div>
+
+
         </div>
     </div>
-
 </div>
 </body>
 </html>
