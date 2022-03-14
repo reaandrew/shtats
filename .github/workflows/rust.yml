@@ -134,7 +134,8 @@ jobs:
           else
             TAG=$GITHUB_SHA
           fi
-          mv ./target/$TARGET/release/$EXEC ./artifacts/$EXEC
+          mv ./target/$TARGET/release/$EXEC ./$EXEC
+          zip ./artifacts/$NAME-$TARGET-$TAG.zip $EXEC
       - name: Archive artifact
         uses: actions/upload-artifact@v2
         with:
@@ -158,4 +159,4 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ./artifacts/*.tar.gz
+          files: ./artifacts/*.zip
