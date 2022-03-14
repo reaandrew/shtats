@@ -25,9 +25,14 @@ pub struct LinesValue{
 pub struct FilesValue{
     pub(crate) key: String,
     pub(crate) files_added: i32,
-    pub(crate) files_deleted: i32,
     pub(crate) files_modified: i32,
-    pub(crate) files_renamed: i32
+    pub(crate) files_deleted: i32,
+    pub(crate) files_renamed: i32,
+    pub(crate) files_copied: i32,
+    pub(crate) files_type_changed: i32,
+    pub(crate) files_unmerged: i32,
+    pub(crate) files_unknown: i32,
+    pub(crate) files_pairing_broken: i32
 }
 
 #[derive(Serialize)]

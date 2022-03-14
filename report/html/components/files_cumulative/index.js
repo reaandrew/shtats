@@ -5,7 +5,7 @@ export default function FilesCumulative({data}){
     function rolling_sum_for_files(data){
         return data.reduce((pre, cur, index) => {
             let val = pre[index-1] === undefined ? 0 : pre[index-1][1];
-            pre.push([cur[0],(cur[1]-cur[2])+val]);
+            pre.push([cur[0],(cur[1]-cur[3])+val]);
             return pre;
         },[]);
     }

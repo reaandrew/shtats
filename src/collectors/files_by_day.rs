@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use serde_json::{Error, Number};
 use crate::{GitCommit, GitStat};
+use crate::models::Operation::{Added, Copied, Deleted, Modified, PairingBroken, Renamed, TypeChanged, Unknown, Unmerged};
 use crate::stats::{FileStats, JsonValue};
 use crate::viewmodel::{FilesValue, GitStatsJsonViewModelItem};
 
@@ -26,6 +27,11 @@ impl JsonValue for FilesByDayCollector {
                 files_deleted: value.deleted,
                 files_modified: value.modified,
                 files_renamed: value.renamed,
+                files_copied: value.copied,
+                files_type_changed: value.type_changed,
+                files_unmerged: value.unmerged,
+                files_unknown: value.unknown,
+                files_pairing_broken: value.pairing_broken
             })
         }
         total_files_by_day.sort_by(|a, b| a.key.cmp(&b.key));
@@ -33,9 +39,14 @@ impl JsonValue for FilesByDayCollector {
             return serde_json::Value::Array(vec![
                 serde_json::Value::String(String::from(&x.key)),
                 serde_json::Value::Number(Number::from(x.files_added)),
-                serde_json::Value::Number(Number::from(x.files_deleted)),
                 serde_json::Value::Number(Number::from(x.files_modified)),
+                serde_json::Value::Number(Number::from(x.files_deleted)),
                 serde_json::Value::Number(Number::from(x.files_renamed)),
+                serde_json::Value::Number(Number::from(x.files_copied)),
+                serde_json::Value::Number(Number::from(x.files_type_changed)),
+                serde_json::Value::Number(Number::from(x.files_unmerged)),
+                serde_json::Value::Number(Number::from(x.files_unknown)),
+                serde_json::Value::Number(Number::from(x.files_pairing_broken)),
             ]);
         }).collect::<Vec<serde_json::Value>>();
 
@@ -55,10 +66,20 @@ impl GitStat for FilesByDayCollector {
                 modified: 0,
                 deleted: 0,
                 renamed: 0,
+                copied: 0,
+                type_changed: 0,
+                unmerged: 0,
+                unknown: 0,
+                pairing_broken: 0
             });
-        stat.added += commit.total_files_added();
-        stat.deleted += commit.total_files_deleted();
-        stat.modified += commit.total_files_modified();
-        stat.renamed += commit.total_files_renamed();
+        stat.added += commit.total_files_of_operation(Added);
+        stat.deleted += commit.total_files_of_operation(Deleted);
+        stat.modified += commit.total_files_of_operation(Modified);
+        stat.renamed += commit.total_files_of_operation(Renamed);
+        stat.copied += commit.total_files_of_operation(Copied);
+        stat.type_changed += commit.total_files_of_operation(TypeChanged);
+        stat.unmerged += commit.total_files_of_operation(Unmerged);
+        stat.unknown += commit.total_files_of_operation(Unknown);
+        stat.pairing_broken += commit.total_files_of_operation(PairingBroken);
     }
 }

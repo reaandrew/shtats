@@ -126,7 +126,7 @@ mod parse_tests {
     use chrono::{DateTime};
     use crate::{parsers};
     use crate::models::GitCommit;
-    use crate::models::Operation::{ADD, DELETE, MODIFY, RENAME};
+    use crate::models::Operation::{Added, Deleted, Modified, Renamed};
 
     #[test]
     fn test_parse_commit() {
@@ -181,16 +181,16 @@ mod parse_tests {
         }
 
         assert_eq!(9, commit.file_operations.len());
-        assert_eq!(ADD, commit.file_operations[0].op);
+        assert_eq!(Added, commit.file_operations[0].op);
         assert_eq!(".github/workflows/rust.yml", commit.file_operations[0].file);
-        assert_eq!(MODIFY, commit.file_operations[1].op);
+        assert_eq!(Modified, commit.file_operations[1].op);
         assert_eq!(".gitignore", commit.file_operations[1].file);
-        assert_eq!(DELETE, commit.file_operations[2].op);
+        assert_eq!(Deleted, commit.file_operations[2].op);
         assert_eq!("Cargo.lock", commit.file_operations[2].file);
-        assert_eq!(RENAME, commit.file_operations[3].op);
+        assert_eq!(Renamed, commit.file_operations[3].op);
         assert_eq!("Cargo.toml", commit.file_operations[3].file);
         assert_eq!("Dapper.EntityFramework NET40/App.config", commit.file_operations[7].file);
-        assert_eq!(MODIFY, commit.file_operations[8].op);
+        assert_eq!(Modified, commit.file_operations[8].op);
         assert_eq!("src/Microsoft.AspNet.PipelineCore/DefaultHttpResponse.cs", commit.file_operations[8].file);
     }
 

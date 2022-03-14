@@ -113,7 +113,7 @@ mod tests {
         ];
         for mut commit in commits {
             commit.file_operations = vec![
-                FileOperation { op: Operation::ADD, file: "file".to_string(), file_extension: "".to_string() }
+                FileOperation { op: Operation::Added, file: "file".to_string(), file_extension: "".to_string() }
             ];
             collector.process(&commit);
         }
@@ -126,14 +126,14 @@ mod tests {
         let mut collector = FilesByCommitsCollector::default();
         let mut commit1 = GitCommit::default();
         commit1.file_operations = vec![
-            FileOperation { op: Operation::ADD, file: "file1".to_string(), file_extension: "".to_string() },
-            FileOperation { op: Operation::ADD, file: "file2".to_string(), file_extension: "".to_string() },
+            FileOperation { op: Operation::Added, file: "file1".to_string(), file_extension: "".to_string() },
+            FileOperation { op: Operation::Added, file: "file2".to_string(), file_extension: "".to_string() },
         ];
         collector.process(&commit1);
 
         let mut commit2 = GitCommit::default();
         commit2.file_operations = vec![
-            FileOperation { op: Operation::MODIFY, file: "file2".to_string(), file_extension: "".to_string() }
+            FileOperation { op: Operation::Modified, file: "file2".to_string(), file_extension: "".to_string() }
         ];
         collector.process(&commit2);
 

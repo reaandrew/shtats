@@ -35,6 +35,11 @@ pub struct FileStats {
     pub(crate) modified: i32,
     pub(crate) deleted: i32,
     pub(crate) renamed: i32,
+    pub(crate) copied: i32,
+    pub(crate) type_changed: i32,
+    pub(crate) unmerged: i32,
+    pub(crate) unknown: i32,
+    pub(crate) pairing_broken: i32
 }
 
 #[derive(Default, Clone, PartialEq)]

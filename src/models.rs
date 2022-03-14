@@ -1,14 +1,18 @@
 use std::str::FromStr;
 use chrono::{DateTime, FixedOffset, Utc};
-use crate::models::Operation::{ADD, DELETE, MODIFY, RENAME};
 
 #[derive(Clone, PartialEq, Debug)]
 #[repr(u8)]
 pub(crate) enum Operation {
-    ADD = b'A',
-    MODIFY = b'M',
-    DELETE = b'D',
-    RENAME = b'R',
+    Added = b'A',
+    Modified = b'M',
+    Deleted = b'D',
+    Renamed = b'R',
+    Copied = b'C',
+    TypeChanged = b'T',
+    Unmerged = b'U',
+    Unknown = b'X',
+    PairingBroken = b'B'
 }
 
 impl FromStr for Operation {
@@ -16,10 +20,15 @@ impl FromStr for Operation {
 
     fn from_str(s: &str) -> Result<Operation, ()> {
         match s.chars().collect::<Vec<char>>().as_slice() {
-            ['A'] => Ok(Operation::ADD),
-            ['M'] => Ok(Operation::MODIFY),
-            ['D'] => Ok(Operation::DELETE),
-            ['R', ..] => Ok(Operation::RENAME),
+            ['A'] => Ok(Operation::Added),
+            ['M'] => Ok(Operation::Modified),
+            ['D'] => Ok(Operation::Deleted),
+            ['R', ..] => Ok(Operation::Renamed),
+            ['C'] => Ok(Operation::Copied),
+            ['T'] => Ok(Operation::TypeChanged),
+            ['U'] => Ok(Operation::Unmerged),
+            ['X'] => Ok(Operation::Unknown),
+            ['B'] => Ok(Operation::PairingBroken),
             _ => Err(()),
         }
     }
@@ -87,20 +96,8 @@ impl GitCommit {
         return self.message.len() as i32;
     }
 
-    pub(crate) fn total_files_added(&self) -> i32 {
-        return self.file_operations.iter().filter(|x| x.op == ADD).count() as i32;
-    }
-
-    pub(crate) fn total_files_deleted(&self) -> i32 {
-        return self.file_operations.iter().filter(|x| x.op == DELETE).count() as i32;
-    }
-
-    pub(crate) fn total_files_modified(&self) -> i32 {
-        return self.file_operations.iter().filter(|x| x.op == MODIFY).count() as i32;
-    }
-
-    pub(crate) fn total_files_renamed(&self) -> i32 {
-        return self.file_operations.iter().filter(|x| x.op == RENAME).count() as i32;
+    pub(crate) fn total_files_of_operation(&self, operation: Operation) -> i32{
+        return self.file_operations.iter().filter(|x|x.op == operation).count() as i32;
     }
 }
 
