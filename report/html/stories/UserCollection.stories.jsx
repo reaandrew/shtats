@@ -17,7 +17,7 @@ function generate_users(count){
     let data = [];
     for (let i = 0; i < count; i++) {
         data.push( {
-            commits: generate_commit_data(Math.ceil(Math.random()*500)),
+            commits: generate_commit_data(Math.ceil(Math.random()*50)),
             lines_added: Math.ceil(Math.random() * 12345),
             lines_deleted: Math.ceil(Math.random() * 3456),
             total_commits: Math.ceil(Math.random() * 123),

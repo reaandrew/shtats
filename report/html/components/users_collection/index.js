@@ -11,7 +11,7 @@ export default function UserCollection({data}) {
 
     function getUserSummaries(){
         return data.map((x, index)=> (
-            <div className="col-4">
+            <div className="col-xs-12 col-sm-12 col-md-4">
                 <UserSummary data={x} id={"user_summary_"+index} />
             </div>
         ));
