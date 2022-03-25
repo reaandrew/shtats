@@ -56,7 +56,7 @@ impl GitStat for SummaryStatsCollector {
         }
 
         if self.summary.first_committer.is_empty() {
-            self.summary.first_committer = String::from(&commit.author);
+            self.summary.first_committer = commit.author.key();
         }
 
         self.summary.total_lines_added += commit.total_lines_added();

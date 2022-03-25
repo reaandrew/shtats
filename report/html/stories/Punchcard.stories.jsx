@@ -4,7 +4,7 @@ import {h} from 'preact';
 import CommitsByHour from '../components/commits_by_hour';
 import '../static/bootstrap.min.css';
 import '../static/shtats.css';
-import {generate_data} from "./utils";
+import {generate_added_deleted_data} from "./utils";
 
 export default {
     title: 'Shtats/Punchcard',

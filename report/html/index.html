@@ -36,12 +36,14 @@
     import CommitsCollection from "./components/commits_collection";
     import LinesCollection from "./components/lines_collection";
     import Files from "./components/files";
+    import UserCollection from "./components/users_collection";
 
     render(<Report>
         <Summary data={viewmodel.summary}/>
         <CommitsCollection data={viewmodel.data.total_commits_by_day}  punch_data={viewmodel.data.punch_data}/>
         <LinesCollection data={viewmodel.data.total_lines_by_day} />
         <Files data={viewmodel.data.total_files_by_day} file_extension_data={viewmodel.data.files_by_extension} />
+        <UserCollection data={viewmodel.data.user_summary_stats} />
     </Report>, document.body);
 </script>
 </body>

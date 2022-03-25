@@ -52,11 +52,23 @@ pub(crate) struct FileOperation {
 pub struct GitCommit {
     pub(crate) commit_hash: String,
     pub(crate) tags: Vec<String>,
-    pub(crate) author: String,
+    pub(crate) author: GitAuthor,
     pub(crate) date: DateTime<FixedOffset>,
     pub(crate) message: Vec<String>,
     pub(crate) file_operations: Vec<FileOperation>,
     pub(crate) line_stats: Vec<LineStat>,
+}
+
+#[derive(Default, Clone, PartialEq)]
+pub struct GitAuthor{
+    pub(crate) name: String,
+    pub(crate) email: String
+}
+
+impl GitAuthor{
+    pub(crate) fn key(&self) -> String{
+        return format!("{}<{}>", self.name, self.email);
+    }
 }
 
 impl GitCommit {
@@ -64,7 +76,7 @@ impl GitCommit {
         return GitCommit {
             commit_hash: "".to_string(),
             tags: vec![],
-            author: "".to_string(),
+            author: Default::default(),
             date: DateTime::from(Utc::now()),
             message: vec![],
             file_operations: vec![],

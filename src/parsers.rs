@@ -5,7 +5,7 @@ use std::process::ChildStdout;
 use std::str::FromStr;
 use chrono::DateTime;
 use crate::{GitStat};
-use crate::models::{FileOperation, GitCommit, LineStat, Operation};
+use crate::models::{FileOperation, GitAuthor, GitCommit, LineStat, Operation};
 use crate::process::process_commit;
 
 /// Extracts the commit hash and the tags from the line
@@ -26,7 +26,14 @@ fn parse_commit(line: &String, commit: &mut GitCommit) {
 
 /// Extracts the raw author string from the line i.e. Name <Email>
 fn parse_author(line: &String, commit: &mut GitCommit) {
-    commit.author = String::from(line[8..].trim());
+    let author = String::from(line[8..].trim());
+    let items = author.split('<').collect::<Vec<&str>>();
+    let name = items[0].trim();
+    let email = items[1].replace(">","");
+    commit.author = GitAuthor{
+        name: String::from(name),
+        email: String::from(email)
+    }
 }
 
 /// Extracts the date from the line
