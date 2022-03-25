@@ -70,7 +70,7 @@ mod summary_stats_collector_tests {
     use chrono::{DateTime, Duration, Utc};
     use crate::{GitCommit, GitStat};
     use crate::collectors::summary_stats::SummaryStatsCollector;
-    use crate::models::LineStat;
+    use crate::models::{GitAuthor, LineStat};
 
     #[test]
     fn test_overall_commit_count_with_1_commit() {
@@ -112,25 +112,25 @@ mod summary_stats_collector_tests {
     #[test]
     fn test_first_committer_1_commit() {
         let mut commit: GitCommit = GitCommit::default();
-        commit.author = String::from("Bob");
+        commit.author = GitAuthor { email: "email1".into(), name: "name1".into() };
 
         let mut collector = SummaryStatsCollector::default();
         collector.process(&commit);
 
-        assert_eq!(collector.summary.first_committer, "Bob");
+        assert_eq!(collector.summary.first_committer, "name1 <email1>");
     }
 
     #[test]
     fn test_first_committer_2_commits() {
         let mut commit_1: GitCommit = GitCommit::default();
-        commit_1.author = String::from("Jeff");
+        commit_1.author = GitAuthor { email: "email1".into(), name: "name1".into() };
         let mut commit_2: GitCommit = GitCommit::default();
-        commit_2.author = String::from("Alan");
+        commit_2.author = GitAuthor { email: "email2".into(), name: "name2".into() };
 
         let mut collector = SummaryStatsCollector::default();
         collector.process(&commit_1);
 
-        assert_eq!(collector.summary.first_committer, "Jeff");
+        assert_eq!(collector.summary.first_committer, "name1 <email1>");
     }
 
     #[test]
@@ -139,7 +139,7 @@ mod summary_stats_collector_tests {
         commit.line_stats = vec![LineStat {
             lines_added: 10,
             lines_deleted: 0,
-            file: "".to_string()
+            file: "".to_string(),
         }];
 
         let mut collector = SummaryStatsCollector::default();
@@ -154,14 +154,14 @@ mod summary_stats_collector_tests {
         commit_1.line_stats = vec![LineStat {
             lines_added: 10,
             lines_deleted: 0,
-            file: "".to_string()
+            file: "".to_string(),
         }];
 
         let mut commit_2: GitCommit = GitCommit::default();
         commit_2.line_stats = vec![LineStat {
             lines_added: 5,
             lines_deleted: 0,
-            file: "".to_string()
+            file: "".to_string(),
         }];
         let mut collector = SummaryStatsCollector::default();
         collector.process(&commit_1);
@@ -177,7 +177,7 @@ mod summary_stats_collector_tests {
         commit.line_stats = vec![LineStat {
             lines_added: 0,
             lines_deleted: 2,
-            file: "".to_string()
+            file: "".to_string(),
         }];
 
         let mut collector = SummaryStatsCollector::default();
@@ -192,14 +192,14 @@ mod summary_stats_collector_tests {
         commit_1.line_stats = vec![LineStat {
             lines_added: 0,
             lines_deleted: 2,
-            file: "".to_string()
+            file: "".to_string(),
         }];
 
         let mut commit_2: GitCommit = GitCommit::default();
         commit_2.line_stats = vec![LineStat {
             lines_added: 0,
             lines_deleted: 7,
-            file: "".to_string()
+            file: "".to_string(),
         }];
 
         let mut collector = SummaryStatsCollector::default();

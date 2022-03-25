@@ -157,7 +157,8 @@ mod parse_tests {
         let mut commit: GitCommit = GitCommit::default();
         let line = "Author: Andy Rea <test@does-not-exist.com>";
         parsers::parse_author(&String::from(line), &mut commit);
-        assert_eq!("Andy Rea <test@does-not-exist.com>", commit.author);
+        assert_eq!("Andy Rea", commit.author.name);
+        assert_eq!("test@does-not-exist.com", commit.author.email);
     }
 
     #[test]

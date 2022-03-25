@@ -67,7 +67,7 @@ pub struct GitAuthor{
 
 impl GitAuthor{
     pub(crate) fn key(&self) -> String{
-        return format!("{}<{}>", self.name, self.email);
+        return format!("{} <{}>", self.name, self.email);
     }
 }
 

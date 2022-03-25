@@ -19,7 +19,7 @@ export default function UserCollection({data}) {
 
     return (
         <div>
-            <div className="row">
+            <div className="row mb-4">
                 <div className="col">
                     <h2>Top 25 Users Summary</h2>
                 </div>
