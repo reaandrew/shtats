@@ -66,3 +66,13 @@ h1, h2,  a {
 .text-success{
     color: #2DA1EF!important;
 }
+
+
+.nav-pills .nav-link{
+    color: #000000;
+}
+
+.nav-pills .nav-link.active{
+    color: white;
+    background-color: #2DA1EF!important;
+}

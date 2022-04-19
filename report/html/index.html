@@ -37,13 +37,16 @@
     import LinesCollection from "./components/lines_collection";
     import Files from "./components/files";
     import UserCollection from "./components/users_collection";
+    import Tabs from "./components/tabs";
 
     render(<Report>
-        <Summary data={viewmodel.summary}/>
-        <CommitsCollection data={viewmodel.data.total_commits_by_day}  punch_data={viewmodel.data.punch_data}/>
-        <LinesCollection data={viewmodel.data.total_lines_by_day} />
-        <Files data={viewmodel.data.total_files_by_day} file_extension_data={viewmodel.data.files_by_extension} />
-        <UserCollection data={viewmodel.data.user_summary_stats} />
+        <Tabs>
+            <Summary data={viewmodel.summary} label={"Summary"}/>
+            <CommitsCollection data={viewmodel.data.total_commits_by_day}  punch_data={viewmodel.data.punch_data} label={"Commits"}/>
+            <LinesCollection data={viewmodel.data.total_lines_by_day} label={"Lines"}/>
+            <Files data={viewmodel.data.total_files_by_day} file_extension_data={viewmodel.data.files_by_extension} label={"Files"} />
+            <UserCollection data={viewmodel.data.user_summary_stats} label={"Users"}/>
+        </Tabs>
     </Report>, document.body);
 </script>
 </body>
