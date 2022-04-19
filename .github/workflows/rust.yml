@@ -137,9 +137,9 @@ jobs:
           mv ./target/$TARGET/release/$EXEC ./$EXEC
           
           if [[ $OS =~ ^windows.*$ ]]; then
-            powershell Compress-Archive $EXEC ./artifacts/$NAME-$TARGET-$TAG.zip
+            powershell Compress-Archive $EXEC ./artifacts/$NAME-$TARGET.zip
           else
-            zip ./artifacts/$NAME-$TARGET-$TAG.zip $EXEC
+            zip ./artifacts/$NAME-$TARGET.zip $EXEC
           fi
       - name: Archive artifact
         uses: actions/upload-artifact@v2
