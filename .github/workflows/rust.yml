@@ -135,7 +135,12 @@ jobs:
             TAG=$GITHUB_SHA
           fi
           mv ./target/$TARGET/release/$EXEC ./$EXEC
-          zip ./artifacts/$NAME-$TARGET-$TAG.zip $EXEC
+          
+          if [[ $OS =~ ^windows.*$ ]]; then
+            powershell Compress-Archive $EXEC ./artifacts/$NAME-$TARGET-$TAG.zip
+          else
+            zip ./artifacts/$NAME-$TARGET-$TAG.zip $EXEC
+          fi
       - name: Archive artifact
         uses: actions/upload-artifact@v2
         with:
