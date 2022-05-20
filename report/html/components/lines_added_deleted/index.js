@@ -32,7 +32,15 @@ function lines_added_vs_deleted(element, added, deleted) {
                 })
             }
         }],
-        grid: [{bottom: '50%'}, {top: '50%'}],
+        grid: [{
+            left: 100,
+            right: 50,
+            bottom: '50%'
+        }, {
+            left: 100,
+            right: 50,
+            top: '50%'
+        }],
         series: [
             {
                 data: added,
