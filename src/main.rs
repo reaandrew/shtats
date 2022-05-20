@@ -73,7 +73,9 @@ fn get_app_matches() -> ArgMatches {
     let app_matches = Command::new("Shtats")
         .author("Andy Rea, email@andrewrea.co.uk")
         .version(GIT_VERSION)
-        .about("Explains in brief what the program does")
+        .about("Gather statistics from your git repository")
+        .arg_required_else_help(true)
+        .subcommand_required(true)
         .subcommand(Command::new("run").arg(
             Arg::new("until")
                 .long("until")
