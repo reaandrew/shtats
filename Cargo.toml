@@ -21,3 +21,4 @@ md5 = "0.7.0"
 [dev-dependencies]
 tempdir = "0.3"
 uuid = { version = "0.8", features = ["v4"] }
+mockall = "0.11.1"

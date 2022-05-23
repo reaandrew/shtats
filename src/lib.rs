@@ -7,6 +7,12 @@ mod collectors;
 pub mod html;
 pub mod process;
 pub mod duplicates;
+pub mod errors;
+pub mod result;
+
+
+use mockall::*;
+use mockall::predicate::*;
 
 use viewmodel::{GitStatsJsonViewModel};
 use crate::collectors::create_stat_collectors;
@@ -15,6 +21,7 @@ use crate::output::{BufferedOutput};
 use crate::stats::{GitStat, LineStats};
 
 
+#[automock]
 pub trait Reporter {
     fn write(&mut self, stats: GitStatsJsonViewModel);
     fn to_string(&self) -> String;
