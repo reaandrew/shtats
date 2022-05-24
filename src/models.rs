@@ -1,5 +1,11 @@
 use std::str::FromStr;
-use chrono::{DateTime, FixedOffset, Utc};
+use chrono::{DateTime, FixedOffset};
+#[cfg(test)]
+use std::fmt::{Display, Formatter};
+#[cfg(test)]
+use mockall::Any;
+#[cfg(test)]
+use serde_json::{json, Value};
 
 #[derive(Clone, PartialEq, Debug)]
 #[repr(u8)]
@@ -59,6 +65,66 @@ pub struct GitCommit {
     pub(crate) line_stats: Vec<LineStat>,
 }
 
+impl Default for GitCommit{
+    fn default() -> Self {
+        return Self{
+            commit_hash: "".to_string(),
+            tags: vec![],
+            author: Default::default(),
+            date: DateTime::parse_from_rfc2822("Thu, 1 Jan 1970 01:01:01 +0000").unwrap(),
+            message: vec![],
+            file_operations: vec![],
+            line_stats: vec![]
+        }
+    }
+}
+
+#[cfg(test)]
+impl Display for GitCommit{
+
+    #[cfg(test)]
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let commit_hash = serde_json::Value::from(self.commit_hash.clone());
+        let tags = serde_json::Value::from(self.tags.clone());
+        let author = json!({
+            "name": self.author.name,
+            "email": self.author.email
+        });
+        let date = serde_json::Value::from(self.date.to_rfc2822());
+        let message = serde_json::Value::from(self.message.join("\n"));
+        let file_operations = serde_json::Value::from(self.file_operations.iter().map(|x|{
+            let file_extension = x.file_extension.clone();
+            let file = x.file.clone();
+            let op = x.op.type_name();
+            json!({
+                "extension":file_extension,
+                "file": file,
+                "op": op
+            })
+        }).collect::<Vec<Value>>());
+        let line_stats = serde_json::Value::from(self.line_stats.iter().map(|x|{
+            let file = x.file.clone();
+            let added = x.lines_added;
+            let deleted = x.lines_deleted;
+            json!({
+                "file": file,
+                "lines_added": added,
+                "lines_deleted": deleted
+            })
+        }).collect::<Vec<Value>>());
+        let data = json!({
+            "commit_hash": commit_hash,
+            "tags": tags,
+            "author": author,
+            "date": date,
+            "message": message,
+            "file_operations": file_operations,
+            "line_stats": line_stats
+        });
+        f.write_str(data.to_string().as_str())
+    }
+}
+
 #[derive(Default, Clone, PartialEq)]
 pub struct GitAuthor{
     pub(crate) name: String,
@@ -72,18 +138,6 @@ impl GitAuthor{
 }
 
 impl GitCommit {
-    pub(crate) fn default() -> Self {
-        return GitCommit {
-            commit_hash: "".to_string(),
-            tags: vec![],
-            author: Default::default(),
-            date: DateTime::from(Utc::now()),
-            message: vec![],
-            file_operations: vec![],
-            line_stats: vec![],
-        };
-    }
-
     pub(crate) fn day_key(&self) -> String {
         return self.date.format("%Y-%m-%d").to_string();
     }
