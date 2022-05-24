@@ -11,10 +11,11 @@ pub mod process;
 pub mod duplicates;
 pub mod errors;
 pub mod result;
+pub mod config;
+pub mod cli;
 
 
 use viewmodel::{GitStatsJsonViewModel};
-use crate::collectors::create_stat_collectors;
 use crate::models::GitCommit;
 use crate::output::{BufferedOutput};
 use crate::stats::{GitStat, LineStats};

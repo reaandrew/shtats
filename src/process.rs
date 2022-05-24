@@ -3,60 +3,96 @@ use std::io::{BufReader, Error, Write};
 use std::path::Path;
 use std::process::{ChildStdout, Command, Stdio};
 use serde_json::{ Value};
-use crate::{create_stat_collectors, GitStatsJsonViewModel, Reporter};
+use crate::{GitStat, GitStatsJsonViewModel, Reporter};
+use crate::collectors::commits_by_day::CommitsByDayCollector;
+use crate::collectors::commits_by_file_extension::CommitsByFileExtension;
+use crate::collectors::files_by_commits::FilesByCommitsCollector;
+use crate::collectors::files_by_day::FilesByDayCollector;
+use crate::collectors::files_by_lines::FilesByLines;
+use crate::collectors::lines_by_day::LinesByDayCollector;
+use crate::collectors::messages::MessagesCollector;
+use crate::collectors::punch_card::PunchCardCollector;
+use crate::collectors::summary_stats::SummaryStatsCollector;
+use crate::collectors::user_summary::UserSummaryCollector;
+use crate::config::Config;
 use crate::parsers::{GitCommitIterator, StdoutGitLogReader};
 
-#[derive(Default)]
-pub struct Config {
-    pub until: Option<String>,
-    pub since: Option<String>,
-    pub output: String
+pub struct Shtats<'a, 'b> {
+    reporter: Box<&'a mut dyn Reporter>,
+    config: Config,
+    process_callback: Box<&'b dyn Fn() -> ()>
 }
 
+impl Shtats<'_, '_>{
 
-// TODO: Change design to reduce number of arguments.
-pub fn run_shtats(path: &Path, reporter: &mut dyn Reporter, config: Config, process_callback: &dyn Fn() -> ()) -> Result<(), Error> {
-    let mut stats_functions = create_stat_collectors();
-    let args = create_git_log_args(&config);
-    let stdout = execute_git(args, path);
-
-    let buf_reader = BufReader::new(stdout);
-    let reader = StdoutGitLogReader{stdout: buf_reader};
-    let iterator = GitCommitIterator::new(Box::new(reader));
-
-    for commit in iterator{
-        for stat in &mut stats_functions{
-            stat.process(&commit);
+    pub fn create<'a, 'b>(reporter: &'a mut dyn Reporter, config: Config, process_callback: &'b dyn Fn() -> ()) -> Shtats<'a, 'b> {
+        return Shtats{
+            reporter: Box::new(reporter),
+            config,
+            process_callback: Box::new(process_callback)
         }
-        process_callback();
     }
 
-    let mut viewmodel = GitStatsJsonViewModel::default();
-    for stat in stats_functions.iter() {
-        let json_viewmodel = stat.get_json_viewmodel().unwrap();
-        let summaries = json_viewmodel.summary.iter()
-            .map(|x| {
-                return serde_json::to_value(x).unwrap();
-            }).collect::<Vec<Value>>();
-        viewmodel.summary.extend(summaries);
-        viewmodel.data.insert(json_viewmodel.key, json_viewmodel.data);
+    pub fn run(&mut self, path: &Path) -> Result<(), Error> {
+        let mut stats_functions = self.create_stat_collectors();
+        let args = create_git_log_args(&self.config);
+
+        let stdout = execute_git(args, path);
+        let buf_reader = BufReader::new(stdout);
+        let reader = StdoutGitLogReader{stdout: buf_reader};
+        let iterator = GitCommitIterator::new(Box::new(reader));
+
+        for commit in iterator{
+            for stat in &mut stats_functions{
+                stat.process(&commit);
+            }
+            (self.process_callback)();
+        }
+
+        let mut viewmodel = GitStatsJsonViewModel::default();
+        for stat in stats_functions.iter() {
+            let json_viewmodel = stat.get_json_viewmodel().unwrap();
+            let summaries = json_viewmodel.summary.iter()
+                .map(|x| {
+                    return serde_json::to_value(x).unwrap();
+                }).collect::<Vec<Value>>();
+            viewmodel.summary.extend(summaries);
+            viewmodel.data.insert(json_viewmodel.key, json_viewmodel.data);
+        }
+        self.reporter.write(viewmodel);
+
+        let path = Path::new(&self.config.output);
+        let display = path.display();
+
+        let mut file = match File::create(&path) {
+            Err(why) => panic!("couldn't create {}: {}", display, why),
+            Ok(file) => file,
+        };
+
+        match file.write_all(self.reporter.to_string().as_bytes()) {
+            Err(why) => panic!("couldn't write to {}: {}", display, why),
+            Ok(_) => { }
+        }
+
+        Ok(())
     }
-    reporter.write(viewmodel);
 
-    let path = Path::new(&config.output);
-    let display = path.display();
-
-    let mut file = match File::create(&path) {
-        Err(why) => panic!("couldn't create {}: {}", display, why),
-        Ok(file) => file,
-    };
-
-    match file.write_all(reporter.to_string().as_bytes()) {
-        Err(why) => panic!("couldn't write to {}: {}", display, why),
-        Ok(_) => { }
+    fn create_stat_collectors(&self) -> Vec<Box<dyn GitStat>> {
+        let stats_functions: Vec<Box<dyn GitStat>> = vec![
+            Box::new(SummaryStatsCollector::default()),
+            Box::new(CommitsByDayCollector::default()),
+            Box::new(LinesByDayCollector::default()),
+            Box::new(MessagesCollector::default()),
+            //Box::new(SimilarFilesChangingCollector::default()),
+            Box::new(FilesByDayCollector::default()),
+            Box::new(PunchCardCollector::default()),
+            Box::new(FilesByCommitsCollector::default()),
+            Box::new(FilesByLines::default()),
+            Box::new(CommitsByFileExtension::default()),
+            Box::new(UserSummaryCollector::default())
+        ];
+        stats_functions
     }
-
-    Ok(())
 }
 
 
