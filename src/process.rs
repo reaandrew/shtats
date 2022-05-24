@@ -1,10 +1,10 @@
 use std::fs::File;
-use std::io::{Error, Write};
+use std::io::{BufReader, Error, Write};
 use std::path::Path;
 use std::process::{ChildStdout, Command, Stdio};
 use serde_json::{ Value};
-use crate::{create_stat_collectors, GitCommit, GitStat, GitStatsJsonViewModel, Reporter};
-use crate::parsers::parse_git_log;
+use crate::{create_stat_collectors, GitStatsJsonViewModel, Reporter};
+use crate::parsers::{GitCommitIterator, StdoutGitLogReader};
 
 #[derive(Default)]
 pub struct Config {
@@ -13,13 +13,6 @@ pub struct Config {
     pub output: String
 }
 
-// TODO: Change design to reduce number of arguments.
-pub fn process_commit(commit: &GitCommit, stat_functions: &mut Vec<Box<dyn GitStat>>, process_callback: &dyn Fn() -> ()) {
-    for stat in stat_functions{
-        stat.process(commit);
-    }
-    process_callback();
-}
 
 // TODO: Change design to reduce number of arguments.
 pub fn run_shtats(path: &Path, reporter: &mut dyn Reporter, config: Config, process_callback: &dyn Fn() -> ()) -> Result<(), Error> {
@@ -27,7 +20,16 @@ pub fn run_shtats(path: &Path, reporter: &mut dyn Reporter, config: Config, proc
     let args = create_git_log_args(&config);
     let stdout = execute_git(args, path);
 
-    parse_git_log(&mut stats_functions, stdout, process_callback);
+    let buf_reader = BufReader::new(stdout);
+    let reader = StdoutGitLogReader{stdout: buf_reader};
+    let iterator = GitCommitIterator::new(Box::new(reader));
+
+    for commit in iterator{
+        for stat in &mut stats_functions{
+            stat.process(&commit);
+        }
+        process_callback();
+    }
 
     let mut viewmodel = GitStatsJsonViewModel::default();
     for stat in stats_functions.iter() {

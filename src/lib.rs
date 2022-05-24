@@ -1,3 +1,5 @@
+#![feature(generic_associated_types)]
+
 pub mod viewmodel;
 pub mod parsers;
 pub mod output;
@@ -7,6 +9,9 @@ mod collectors;
 pub mod html;
 pub mod process;
 pub mod duplicates;
+pub mod errors;
+pub mod result;
+
 
 use viewmodel::{GitStatsJsonViewModel};
 use crate::collectors::create_stat_collectors;
