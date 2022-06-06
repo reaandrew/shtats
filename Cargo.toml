@@ -23,3 +23,10 @@ md5 = "0.7.0"
 tempdir = "0.3"
 uuid = { version = "0.8", features = ["v4"] }
 mockall = "0.11.1"
+
+[profile.release]
+strip = true  # Automatically strip symbols from the binary.
+opt-level = "z"  # Optimize for size.
+lto = true
+codegen-units = 1
+panic = "abort"

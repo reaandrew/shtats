@@ -33,7 +33,7 @@ fn main() {
             }
         }
         Err(err) => {
-            eprintln!("error: {:?}", err);
+            eprintln!("error: {}", err);
         }
     }
 
