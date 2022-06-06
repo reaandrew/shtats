@@ -30,6 +30,7 @@ impl ProcessGitExecutor {
         let child = Command::new("git")
             .current_dir(path)
             .args(vec!["status"])
+            .stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .spawn().unwrap();
         let stderr = child.stderr.unwrap();
@@ -220,7 +221,6 @@ mod stderr_tests {
         let mut buf_reader = BufReader::new(stderr);
         let mut output: String = String::new();
         let read_size = buf_reader.read_to_string(&mut output).unwrap();
-        println!("{}", output);
         assert!(read_size > 0)
     }
 }
