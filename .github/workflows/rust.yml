@@ -64,22 +64,22 @@ jobs:
         include:
           - TARGET: x86_64-unknown-linux-gnu # tested in a debian container on a mac
             OS: ubuntu-latest
-            FILE: /target/x86_64-unknown-linux-gnu/release/shtats
+            FILE: target/x86_64-unknown-linux-gnu/release/shtats
             ARGS: --best --lzma
             STRIP: true
           - TARGET: x86_64-unknown-linux-musl # test in an alpine container on a mac
             OS: ubuntu-latest
-            FILE: /target/x86_64-unknown-linux-musl/release/shtats
+            FILE: target/x86_64-unknown-linux-musl/release/shtats
             ARGS: --best --lzma
             STRIP: true
           - TARGET: x86_64-apple-darwin # tested on a mac, is not properly signed so there are security warnings
             OS: macos-latest
-            FILE: /target/x86_64-apple-darwin/release/shtats
+            FILE: target/x86_64-apple-darwin/release/shtats
             ARGS: --best --lzma
             STRIP: true
           - TARGET: x86_64-pc-windows-gnu # tested on a windows machine
             OS: windows-latest
-            FILE: /target/x86_64-pc-windows-gnu/release/shtats.exe
+            FILE: target/x86_64-pc-windows-gnu/release/shtats.exe
             ARGS: --best --lzma
             STRIP: true
     needs: test
@@ -130,14 +130,14 @@ jobs:
           name: index.html
       - name: Run build
         run: cargo build --release --verbose --target $TARGET
+      - name: List target
+        run: find ./target
       - name: Compress binaries
         uses: svenstaro/upx-action@v2
         with:
           file: ${{ matrix.FILE }}
           args: ${{ matrix.ARGS }}
           strip: ${{ matrix.STRIP }}
-      - name: List target
-        run: find ./target
       - name: Compress
         run: |
           mkdir -p ./artifacts
