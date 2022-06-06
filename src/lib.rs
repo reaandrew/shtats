@@ -1,4 +1,5 @@
 #![feature(generic_associated_types)]
+#![feature(buf_read_has_data_left)]
 
 pub mod viewmodel;
 pub mod parsers;

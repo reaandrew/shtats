@@ -23,7 +23,7 @@ pub struct GitCommitIterator {
 }
 
 impl GitCommitIterator {
-    pub(crate) fn new(reader: Box<dyn GitLogReader>) -> GitCommitIterator {
+    pub fn new(reader: Box<dyn GitLogReader>) -> GitCommitIterator {
         return GitCommitIterator {
             finished: false,
             buffer: String::new(),

@@ -1,33 +1,28 @@
-use std::{fs, path};
 use std::fs::File;
-use std::io::{Error, Write};
+use std::io::{Write};
 use std::path::{PathBuf};
 use std::process::{Command, Stdio};
-use tempdir::TempDir;
 use uuid::Uuid;
 
 
-fn git_init(path: &PathBuf) -> Result<(), Error> {
+pub fn git_init(path: &PathBuf) {
     let mut git_init = Command::new("git");
     git_init.args(vec!["init"]);
     git_init.current_dir(
         &path
-    ).output()?;
-    Ok(())
+    ).output().expect("failed to git init");
 }
 
-fn git_status(path: &PathBuf) -> Result<(), Error> {
+pub fn git_status(path: &PathBuf){
     let mut git_status = Command::new("git");
     git_status.args(vec!["status"]);
     git_status.stdout(Stdio::piped());
     let _output = git_status.current_dir(
         &path
-    ).output()?;
-
-    Ok(())
+    ).output().expect("failed to execute git status");
 }
 
-fn git_commit(path: &PathBuf, message: &str) -> Result<(), Error>{
+pub fn git_commit(path: &PathBuf, message: &str){
     let mut git_add = Command::new("git");
     git_add.args(vec![
         "add",
@@ -36,7 +31,7 @@ fn git_commit(path: &PathBuf, message: &str) -> Result<(), Error>{
     git_add.stdout(Stdio::piped());
     git_add.current_dir(
         &path
-    ).output()?;
+    ).output().expect("failed to execute git add");
 
     let mut git_commit = Command::new("git");
     git_commit.args(vec![
@@ -48,12 +43,10 @@ fn git_commit(path: &PathBuf, message: &str) -> Result<(), Error>{
     git_commit.stdout(Stdio::piped());
     let _output = git_commit.current_dir(
         &path
-    ).output()?;
-
-    Ok(())
+    ).output().expect("failed to execute git commit");
 }
 
-fn git_log(path: &PathBuf) -> Result<(), Error>{
+pub fn git_log(path: &PathBuf){
     let mut git_log = Command::new("git");
     git_log.args(vec![
         "log",
@@ -62,52 +55,12 @@ fn git_log(path: &PathBuf) -> Result<(), Error>{
     git_log.stdout(Stdio::piped());
     let _output = git_log.current_dir(
         &path
-    ).output()?;
-    Ok(())
+    ).output().expect("failed to execute git log");
 }
 
-fn create_file(path: &PathBuf) -> Result<(), Error>{
+pub fn create_file(path: &PathBuf){
     let uuid = Uuid::new_v4();
-    let mut file = File::create(path.join(uuid.to_string()))?;
-    file.write_all(b"Hello, world!")?;
-
-    Ok(())
+    let mut file = File::create(path.join(uuid.to_string())).expect("failed to create file");
+    file.write_all(b"Hello, world!").expect("failed to write file");
 }
 
-pub fn setup_git_repo<T>(test_func: T) -> Result<(), Error> where T: Fn(&path::Path) -> Result<(), Error>{
-    let tmp_dir = TempDir::new("example").expect("could not create the temp directory");
-    let path = tmp_dir.path().join("ssgs");
-
-    fs::create_dir(&path).expect("could not create temp directory");
-
-    let run = || -> Result<(), Error>{
-        git_init(&path)?;
-        create_file(&path)?;
-        git_commit(&path, "file 1")?;
-        git_status(&path)?;
-        println!("Committed file 1");
-        create_file(&path)?;
-        git_commit(&path, "file 2")?;
-        git_status(&path)?;
-        println!("Committed file 2");
-        create_file(&path)?;
-        git_commit(&path, "file 3")?;
-        println!("Committed file 3");
-        git_status(&path)?;
-        git_log(&path)?;
-        Ok(())
-    };
-
-    match run() {
-        Ok(_) => {
-            test_func(path.as_path())?;
-            tmp_dir.close()?;
-            Ok(())
-        }
-        Err(err) => {
-            println!("{}", err);
-            tmp_dir.close()?;
-            Err(err)
-        }
-    }
-}

@@ -7,3 +7,8 @@ index.html:
 .PHONY: build
 build: index.html
 	cargo build
+
+.PHONY: test
+test: index.html
+	cargo test
+
