@@ -154,11 +154,7 @@ jobs:
           fi
           mv ./target/$TARGET/release/$EXEC ./$EXEC
           
-          if [[ $OS =~ ^windows.*$ ]]; then
-            powershell Compress-Archive $EXEC ./artifacts/$NAME-$TARGET.zip
-          else
-            zip ./artifacts/$NAME-$TARGET.zip $EXEC
-          fi
+          tar -czf ./artifacts/$NAME-$TARGET.tar.gz $EXEC
       - name: Archive artifact
         uses: actions/upload-artifact@v2
         with:
