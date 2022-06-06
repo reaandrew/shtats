@@ -12,6 +12,7 @@ use crate::common::{create_file, git_commit, git_init, git_log, git_status};
 mod common;
 
 #[test]
+#[ignore]
 /// This is a really basic, rough test asserting on one fact of the JSON inside the generated HTML
 fn test_cli_report() {
     let tmp_dir = TempDir::new("example").expect("could not create the temp directory");
@@ -50,6 +51,7 @@ fn test_cli_report() {
 
 
 #[test]
+#[ignore]
 fn test_capturing_failure_on_non_git_repository(){
     let tmp_dir = TempDir::new("example").expect("could not create the temp directory");
     let path = tmp_dir.path().join("ssgs");
