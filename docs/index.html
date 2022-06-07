@@ -22,7 +22,8 @@
     <link rel="stylesheet" href="css/shtats.css?v=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald&family=Roboto:wght@300&family=Smooch+Sans:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald&family=Roboto:wght@300&family=Smooch+Sans:wght@500&display=swap"
+          rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <script src="https://kit.fontawesome.com/6ac496395b.js" crossorigin="anonymous"></script>
@@ -31,7 +32,11 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-HXB15HKNMQ"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
         gtag('js', new Date());
 
         gtag('config', 'G-HXB15HKNMQ');
@@ -39,7 +44,7 @@
 </head>
 
 <body>
-<div class="container">
+<div class="container fill-height">
     <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container-fluid">
             <h1>SHTATS</h1>
@@ -56,7 +61,8 @@
                         <hr class="my-4">
                         <p>This tool has been developed in rust and uses preact and echarts for the report.</p>
                         <p class="lead">
-                            <a class="btn btn-primary btn-lg" href="https://github.com/reaandrew/shtats" role="button">Go to Github Repository</a>
+                            <a class="btn btn-primary btn-lg" href="https://github.com/reaandrew/shtats" role="button">Go
+                                to Github Repository</a>
                         </p>
                     </div>
                 </div>
@@ -72,7 +78,9 @@
                         <div class="col text-center"><i class="fa fa-linux fa-6x"></i></div>
                     </div>
                     <div class="row">
-                        <div class="col text-center"><a href="https://github.com/reaandrew/shtats/releases/latest/download/shtats-x86_64-unknown-linux-gnu.tar.gz">Download for Linux</a></div>
+                        <div class="col text-center"><a
+                                href="https://github.com/reaandrew/shtats/releases/latest/download/shtats-x86_64-unknown-linux-gnu.tar.gz">Download
+                            for Linux</a></div>
                     </div>
                 </div>
                 <div class="col">
@@ -80,7 +88,9 @@
                         <div class="col text-center"><i class="fa fa-windows fa-6x"></i></div>
                     </div>
                     <div class="row">
-                        <div class="col text-center"><a href="https://github.com/reaandrew/shtats/releases/latest/download/shtats-x86_64-pc-windows-gnu.tar.gz">Download for Windows</a></div>
+                        <div class="col text-center"><a
+                                href="https://github.com/reaandrew/shtats/releases/latest/download/shtats-x86_64-pc-windows-gnu.tar.gz">Download
+                            for Windows</a></div>
                     </div>
                 </div>
                 <div class="col">
@@ -88,10 +98,27 @@
                         <div class="col text-center"><i class="fa fa-apple fa-6x"></i></div>
                     </div>
                     <div class="row">
-                        <div class="col text-center"><a href="https://github.com/reaandrew/shtats/releases/latest/download/shtats-x86_64-apple-darwin.tar.gz">Download for Mac</a></div>
+                        <div class="col text-center"><a
+                                href="https://github.com/reaandrew/shtats/releases/latest/download/shtats-x86_64-apple-darwin.tar.gz">Download
+                            for Mac</a></div>
                     </div>
                 </div>
             </div>
+            <div class="row mt-4 pt-4">
+                <div class="col">
+                    <h3>Running</h3>
+                </div>
+
+            </div>
+            <div class="row mt-2 pt-4">
+                <div class="col">
+                    <h5>1. Download and unpack <code>tar -zxvf &lt;shtats.tar.gz&gt;</code></h5>
+                    <h5>2. Change directory to your git repository <code>cd &lt;git repo&gt;</code></h5>
+                    <h5>3. Run shtats <code>shtats run</code> (add shtats to your path or use absolute path)</h5>
+                    <h5>4. Open report.html in your browser <code>firefox report.html</code></h5>
+                </div>
+            </div>
+
         </div>
         <div class="col-md-3 col-lg-3 col-sm-12 col-xs-12 text-center">
             <img src="images/shtats_thumbnail.png" class="img-fluid mt-4"/>
