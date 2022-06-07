@@ -83,3 +83,35 @@ impl GitStat for FilesByDayCollector {
         stat.pairing_broken += commit.total_files_of_operation(PairingBroken);
     }
 }
+
+#[cfg(test)]
+mod tests{
+    use crate::{GitCommit, GitStat};
+    use crate::collectors::files_by_day::FilesByDayCollector;
+    use crate::models::{FileOperation, Operation};
+    use crate::stats::JsonValue;
+
+    #[test]
+    fn test_process(){
+        let mut subject = FilesByDayCollector::default();
+        let commit: GitCommit = GitCommit::default();
+        subject.process(&commit);
+
+        assert_eq!(subject.total_files_by_day.len(), 1)
+    }
+
+    #[test]
+    fn test_json_viewmodel(){
+        let mut subject = FilesByDayCollector::default();
+        let mut commit: GitCommit = GitCommit::default();
+        commit.file_operations.push(FileOperation{
+            op: Operation::Added,
+            file: "anything.rs".to_string(),
+            file_extension: ".rs".to_string()
+        });
+        subject.process(&commit);
+
+        let result = subject.get_json_viewmodel().unwrap();
+        assert_eq!(result.data.to_string(), "[[\"1970-01-01\",1,0,0,0,0,0,0,0,0]]");
+    }
+}

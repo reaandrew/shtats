@@ -76,3 +76,52 @@ impl GitStat for FilesByLines{
         }
     }
 }
+
+#[cfg(test)]
+mod tests{
+    use crate::{GitCommit, GitStat};
+    use crate::collectors::files_by_lines::FilesByLines;
+    use crate::models::{LineStat};
+    use crate::stats::JsonValue;
+
+    #[test]
+    fn test_process(){
+        let mut subject = FilesByLines::default();
+        let mut commit: GitCommit = GitCommit::default();
+        commit.line_stats.push(LineStat{
+            lines_added: 1,
+            lines_deleted: 2,
+            file: "file1.rs".to_string()
+        });
+        commit.line_stats.push(LineStat{
+            lines_added: 2,
+            lines_deleted: 4,
+            file: "file2.rs".to_string()
+        });
+        subject.process(&commit);
+
+        assert_eq!(subject.most_churn_single_commit, 6);
+        assert_eq!(subject.most_lines_added_single_commit, 2);
+        assert_eq!(subject.most_lines_deleted_single_commit, 4);
+    }
+
+    #[test]
+    fn test_json_viewmodel(){
+        let mut subject = FilesByLines::default();
+        let mut commit: GitCommit = GitCommit::default();
+        commit.line_stats.push(LineStat{
+            lines_added: 1,
+            lines_deleted: 2,
+            file: "file1.rs".to_string()
+        });
+        commit.line_stats.push(LineStat{
+            lines_added: 2,
+            lines_deleted: 4,
+            file: "file2.rs".to_string()
+        });
+        subject.process(&commit);
+
+        let result = subject.get_json_viewmodel().unwrap();
+        assert_eq!(result.summary.len(), 3);
+    }
+}

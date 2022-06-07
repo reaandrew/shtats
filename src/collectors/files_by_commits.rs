@@ -46,13 +46,6 @@ impl JsonValue for FilesByCommitsCollector {
         let highest_commits = self.get_highest_commits();
         let files_with_highest_commits =self.count_files_with_commits(highest_commits);
 
-        // let object = json!({
-        //     "lowest_number_of_commits": lowest_commits,
-        //     "with_lowest_commits": lowest_items,
-        //     "highest_number_of_commits": highest_commits,
-        //     "with_highest_commits": highest_items
-        // });
-
         let pluralize = |value:String, input: usize|->String{
             return if input > 1 {
                 format!("{}s", value)

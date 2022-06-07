@@ -43,3 +43,40 @@ impl GitStat for CommitsByFileExtension {
         }
     }
 }
+
+#[cfg(test)]
+mod tests{
+    use crate::{GitCommit, GitStat};
+    use crate::collectors::commits_by_file_extension::CommitsByFileExtension;
+    use crate::models::{FileOperation, Operation};
+    use crate::stats::JsonValue;
+
+    #[test]
+    fn test_process(){
+        let mut subject = CommitsByFileExtension::default();
+        let mut commit: GitCommit = GitCommit::default();
+        commit.file_operations.push(FileOperation{
+            op: Operation::Added,
+            file: "anything.rs".to_string(),
+            file_extension: ".rs".to_string()
+        });
+        subject.process(&commit);
+
+        assert_eq!(subject.data.len(), 1)
+    }
+
+    #[test]
+    fn test_json_viewmodel(){
+        let mut subject = CommitsByFileExtension::default();
+        let mut commit: GitCommit = GitCommit::default();
+        commit.file_operations.push(FileOperation{
+            op: Operation::Added,
+            file: "anything.rs".to_string(),
+            file_extension: ".rs".to_string()
+        });
+        subject.process(&commit);
+
+        let result = subject.get_json_viewmodel().unwrap();
+        assert_eq!(result.data.to_string(), "[{\"name\":\".rs\",\"value\":1}]");
+    }
+}

@@ -90,3 +90,39 @@ impl GitStat for MessagesCollector {
         self.message_stats.avg_lines = self.total_message_lines / self.count;
     }
 }
+
+#[cfg(test)]
+mod tests{
+    use crate::{GitCommit, GitStat};
+    use crate::collectors::messages::MessagesCollector;
+    use crate::stats::JsonValue;
+
+    #[test]
+    fn test_process(){
+        let mut subject = MessagesCollector::default();
+        let mut commit: GitCommit = GitCommit::default();
+        commit.message.push(String::from("line 1"));
+        commit.message.push(String::from("line 2"));
+        commit.message.push(String::from("line 3"));
+        commit.message.push(String::from("line 4"));
+        subject.process(&commit);
+
+        assert_eq!(subject.count, 1);
+        assert_eq!(subject.total_message_lines, 4);
+        assert_eq!(subject.total_message_size, 24);
+    }
+
+    #[test]
+    fn test_json_viewmodel(){
+        let mut subject = MessagesCollector::default();
+        let mut commit: GitCommit = GitCommit::default();
+        commit.message.push(String::from("line 1"));
+        commit.message.push(String::from("line 2"));
+        commit.message.push(String::from("line 3"));
+        commit.message.push(String::from("line 4"));
+        subject.process(&commit);
+
+        let result = subject.get_json_viewmodel().unwrap();
+        assert_eq!(result.summary.len(), 6);
+    }
+}

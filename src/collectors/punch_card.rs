@@ -54,3 +54,29 @@ impl GitStat for PunchCardCollector {
         stat.commits += 1
     }
 }
+
+#[cfg(test)]
+mod tests{
+    use crate::{GitCommit, GitStat};
+    use crate::collectors::punch_card::PunchCardCollector;
+    use crate::stats::JsonValue;
+
+    #[test]
+    fn test_process(){
+        let mut subject = PunchCardCollector::default();
+        let commit: GitCommit = GitCommit::default();
+        subject.process(&commit);
+
+        assert_eq!(subject.punchcard.len(), 1)
+    }
+
+    #[test]
+    fn test_json_viewmodel(){
+        let mut subject = PunchCardCollector::default();
+        let commit: GitCommit = GitCommit::default();
+        subject.process(&commit);
+
+        let result = subject.get_json_viewmodel().unwrap();
+        assert_eq!(result.data.to_string(), "[[4,1,1]]");
+    }
+}
