@@ -50,6 +50,7 @@ impl Error for ShtatsError{}
 
 #[cfg(test)]
 mod tests{
+    use std::io::{Error, ErrorKind};
     use crate::errors::{ERR_EXECUTING_GIT_VALUE, ERR_NOT_GIT_REPOSITORY, ERR_UNSAFE_GIT_REPOSITORY_VALUE, ErrorType, ShtatsError};
 
     #[test]
@@ -69,5 +70,19 @@ mod tests{
     fn test_reg_error_display_for_err_not_git_repository(){
         let error = ShtatsError::Regular(ErrorType::ErrNotGitRepository);
         assert_eq!(error.to_string(), ERR_NOT_GIT_REPOSITORY)
+    }
+
+    #[test]
+    fn test_shtats_error_for_io(){
+        let custom_error = Error::new(ErrorKind::Other, "oh no!");
+        let error = ShtatsError::Std(custom_error);
+        assert_eq!(error.to_string(), "oh no!");
+    }
+
+    #[test]
+    fn test_shtats_error_from_io(){
+        let custom_error = Error::new(ErrorKind::Other, "oh no!");
+        let error = ShtatsError::from(custom_error);
+        assert_eq!(error.to_string(), "oh no!");
     }
 }

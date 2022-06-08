@@ -1,3 +1,4 @@
+use std::env;
 use std::path::Path;
 use std::process::exit;
 use shtats::html::{HtmlReporter, PreactTemplate};
@@ -12,7 +13,8 @@ fn main() {
     // TODO: Duplicate Commit Messages
     // TODO: Duplicate Commit Messages by user
     // TODO: Commits By Year if no time filter has been applied
-    let cli = Cli::create();
+    let args: Vec<String> = env::args().collect();
+    let cli = Cli::create(args);
     let config = Config::from(cli);
     match get_number_of_commits(){
         Ok(number_of_commits) => {

@@ -59,7 +59,7 @@ impl HtmlReporter {
 #[cfg(test)]
 mod tests{
     use serde_json::{json, Value};
-    use crate::{BufferedOutput, GitStatsJsonViewModel, Reporter};
+    use crate::{ GitStatsJsonViewModel, Reporter};
     use crate::html::{HtmlReporter, HtmlTemplate};
     use crate::viewmodel::{GitStatsJsonViewModelItem, SummaryViewModelItem};
 

@@ -18,7 +18,7 @@ pub(crate) enum Operation {
     TypeChanged = b'T',
     Unmerged = b'U',
     Unknown = b'X',
-    PairingBroken = b'B'
+    PairingBroken = b'B',
 }
 
 impl FromStr for Operation {
@@ -65,23 +65,22 @@ pub struct GitCommit {
     pub(crate) line_stats: Vec<LineStat>,
 }
 
-impl Default for GitCommit{
+impl Default for GitCommit {
     fn default() -> Self {
-        return Self{
+        return Self {
             commit_hash: "".to_string(),
             tags: vec![],
             author: Default::default(),
             date: DateTime::parse_from_rfc2822("Thu, 1 Jan 1970 01:01:01 +0000").unwrap(),
             message: vec![],
             file_operations: vec![],
-            line_stats: vec![]
-        }
+            line_stats: vec![],
+        };
     }
 }
 
 #[cfg(test)]
-impl Display for GitCommit{
-
+impl Display for GitCommit {
     #[cfg(test)]
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let commit_hash = serde_json::Value::from(self.commit_hash.clone());
@@ -92,7 +91,7 @@ impl Display for GitCommit{
         });
         let date = serde_json::Value::from(self.date.to_rfc2822());
         let message = serde_json::Value::from(self.message.join("\n"));
-        let file_operations = serde_json::Value::from(self.file_operations.iter().map(|x|{
+        let file_operations = serde_json::Value::from(self.file_operations.iter().map(|x| {
             let file_extension = x.file_extension.clone();
             let file = x.file.clone();
             let op = x.op.type_name();
@@ -102,7 +101,7 @@ impl Display for GitCommit{
                 "op": op
             })
         }).collect::<Vec<Value>>());
-        let line_stats = serde_json::Value::from(self.line_stats.iter().map(|x|{
+        let line_stats = serde_json::Value::from(self.line_stats.iter().map(|x| {
             let file = x.file.clone();
             let added = x.lines_added;
             let deleted = x.lines_deleted;
@@ -126,13 +125,13 @@ impl Display for GitCommit{
 }
 
 #[derive(Default, Clone, PartialEq)]
-pub struct GitAuthor{
+pub struct GitAuthor {
     pub(crate) name: String,
-    pub(crate) email: String
+    pub(crate) email: String,
 }
 
-impl GitAuthor{
-    pub(crate) fn key(&self) -> String{
+impl GitAuthor {
+    pub(crate) fn key(&self) -> String {
         return format!("{} <{}>", self.name, self.email);
     }
 }
@@ -162,8 +161,8 @@ impl GitCommit {
         return self.message.len() as i32;
     }
 
-    pub(crate) fn total_files_of_operation(&self, operation: Operation) -> i32{
-        return self.file_operations.iter().filter(|x|x.op == operation).count() as i32;
+    pub(crate) fn total_files_of_operation(&self, operation: Operation) -> i32 {
+        return self.file_operations.iter().filter(|x| x.op == operation).count() as i32;
     }
 }
 
@@ -179,14 +178,65 @@ mod commit_tests {
         commit.line_stats.push(LineStat {
             lines_added: 1,
             lines_deleted: 2,
-            file: "".to_string()
+            file: "".to_string(),
         });
         commit.line_stats.push(LineStat {
             lines_added: 4,
             lines_deleted: 6,
-            file: "".to_string()
+            file: "".to_string(),
         });
         assert_eq!(5, commit.total_lines_added());
         assert_eq!(8, commit.total_lines_deleted());
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::str::FromStr;
+    use crate::models::Operation;
+
+    #[test]
+    fn operations_added_from_string() {
+        assert_eq!(Operation::Added, Operation::from_str("A").unwrap());
+    }
+
+    #[test]
+    fn operations_copied_from_string() {
+        assert_eq!(Operation::Copied, Operation::from_str("C").unwrap());
+    }
+
+    #[test]
+    fn operations_deleted_from_string() {
+        assert_eq!(Operation::Deleted, Operation::from_str("D").unwrap());
+    }
+
+    #[test]
+    fn operations_modified_from_string() {
+        assert_eq!(Operation::Modified, Operation::from_str("M").unwrap());
+    }
+
+    #[test]
+    fn operations_pairing_broken_from_string() {
+        assert_eq!(Operation::PairingBroken, Operation::from_str("B").unwrap());
+    }
+
+    #[test]
+    fn operations_renamed_from_string() {
+        assert_eq!(Operation::Renamed, Operation::from_str("R").unwrap());
+    }
+
+    #[test]
+    fn operations_unknown_from_string() {
+        assert_eq!(Operation::Unknown, Operation::from_str("X").unwrap());
+    }
+
+    #[test]
+    fn operations_unmerged_from_string() {
+        assert_eq!(Operation::Unmerged, Operation::from_str("U").unwrap());
+    }
+
+    #[test]
+    fn operations_type_changed_from_string() {
+        assert_eq!(Operation::TypeChanged, Operation::from_str("T").unwrap());
     }
 }

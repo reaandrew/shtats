@@ -4,7 +4,6 @@ use tempdir::TempDir;
 use shtats::config::Config;
 use shtats::errors::{ErrorType, ShtatsError};
 use shtats::html::{HtmlReporter, PreactTemplate};
-use shtats::output::BufferedOutput;
 use shtats::process::{ProcessGitExecutor, Shtats};
 use shtats::Reporter;
 use crate::common::{create_file, git_commit, git_init, git_log, git_status};

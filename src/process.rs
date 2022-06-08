@@ -202,6 +202,29 @@ pub fn get_number_of_commits() -> result::Result<i32>{
 }
 
 #[cfg(test)]
+mod tests{
+    use crate::process::create_git_log_args;
+
+    #[test]
+    fn test_git_log_args(){
+        let expected = vec![
+            "--no-pager",
+            "log",
+            "--all",
+            "--raw",
+            "--decorate",
+            "--date-order",
+            "--reverse",
+            "--numstat",
+            "--date=rfc2822",
+        ];
+        let actual = create_git_log_args(&Default::default());
+
+        assert_eq!(actual, expected);
+    }
+}
+
+#[cfg(test)]
 mod stderr_tests {
     use std::io::{BufReader, Read};
     use std::path::Path;

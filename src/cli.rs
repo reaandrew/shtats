@@ -8,7 +8,7 @@ pub struct Cli{
 }
 
 impl Cli {
-    pub fn create() -> ArgMatches {
+    pub fn create(args: Vec<String>) -> ArgMatches {
         let app_matches = Command::new("Shtats")
             .author("Andy Rea, email@andrewrea.co.uk")
             .version(GIT_VERSION)
@@ -36,7 +36,7 @@ impl Cli {
                     .default_value("report.html")
                     .help("output filename to write the report to"),
             ), )
-            .get_matches();
+            .get_matches_from(args);
         app_matches
     }
 }
