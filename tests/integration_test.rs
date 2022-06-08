@@ -3,7 +3,7 @@ use std::{env, fs};
 use tempdir::TempDir;
 use shtats::config::Config;
 use shtats::errors::{ErrorType, ShtatsError};
-use shtats::html::HtmlReporter;
+use shtats::html::{HtmlReporter, PreactTemplate};
 use shtats::output::BufferedOutput;
 use shtats::process::{ProcessGitExecutor, Shtats};
 use shtats::Reporter;
@@ -34,8 +34,7 @@ fn test_cli_report() {
     git_status(&path);
     git_log(&path);
 
-    let output = BufferedOutput::new();
-    let mut reporter = HtmlReporter::new(output);
+    let mut reporter = HtmlReporter::new( PreactTemplate{});
     let config = Config {
         until: None,
         since: None,
@@ -59,8 +58,7 @@ fn test_capturing_failure_on_non_git_repository(){
 
     let _ = env::set_current_dir(&path);
 
-    let output = BufferedOutput::new();
-    let mut reporter = HtmlReporter::new(output);
+    let mut reporter = HtmlReporter::new(PreactTemplate{});
     let config = Config {
         until: None,
         since: None,

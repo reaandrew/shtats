@@ -1,6 +1,6 @@
 use std::path::Path;
 use std::process::exit;
-use shtats::html::HtmlReporter;
+use shtats::html::{HtmlReporter, PreactTemplate};
 use shtats::output::BufferedOutput;
 use shtats::process::{get_number_of_commits, ProcessGitExecutor, Shtats};
 use indicatif::ProgressBar;
@@ -17,7 +17,7 @@ fn main() {
     match get_number_of_commits(){
         Ok(number_of_commits) => {
             let pb = ProgressBar::new(number_of_commits as u64);
-            let mut reporter = HtmlReporter::new(BufferedOutput::new());
+            let mut reporter = HtmlReporter::new( PreactTemplate{});
             let executor = Box::new(ProcessGitExecutor{});
             let process_callback = || pb.inc(1);
             let mut shtats = Shtats::create(&mut reporter, config, executor,&process_callback);

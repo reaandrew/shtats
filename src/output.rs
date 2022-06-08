@@ -16,3 +16,16 @@ impl BufferedOutput {
         String::from_utf8(self.0).unwrap()
     }
 }
+
+#[cfg(test)]
+mod tests{
+    use crate::BufferedOutput;
+
+    #[test]
+    fn test_write(){
+        let mut subject = BufferedOutput::new();
+        subject.write(String::from("something"));
+
+        assert_eq!(subject.to_string(), "something");
+    }
+}
