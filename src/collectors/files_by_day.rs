@@ -86,10 +86,9 @@ impl GitStat for FilesByDayCollector {
 
 #[cfg(test)]
 mod tests{
-    use crate::{GitCommit, GitStat};
     use crate::collectors::files_by_day::FilesByDayCollector;
     use crate::models::{FileOperation, GitCommit, Operation};
-    use crate::stats::JsonValue;
+    use crate::stats::{GitStat, JsonValue};
 
     #[test]
     fn test_process(){

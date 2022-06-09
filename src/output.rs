@@ -19,7 +19,6 @@ impl BufferedOutput {
 
 #[cfg(test)]
 mod tests{
-    use crate::BufferedOutput;
     use crate::output::BufferedOutput;
 
     #[test]

@@ -68,9 +68,9 @@ impl GitStat for SummaryStatsCollector {
 #[cfg(test)]
 mod summary_stats_collector_tests {
     use chrono::{DateTime, Duration, Utc};
-    use crate::{GitCommit, GitStat};
     use crate::collectors::summary_stats::SummaryStatsCollector;
     use crate::models::{GitAuthor, GitCommit, LineStat};
+    use crate::stats::GitStat;
 
     #[test]
     fn test_overall_commit_count_with_1_commit() {

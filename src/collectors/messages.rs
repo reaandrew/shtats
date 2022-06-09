@@ -93,7 +93,6 @@ impl GitStat for MessagesCollector {
 
 #[cfg(test)]
 mod tests{
-    use crate::{GitCommit, GitStat};
     use crate::collectors::messages::MessagesCollector;
     use crate::models::GitCommit;
     use crate::stats::{GitStat, JsonValue};

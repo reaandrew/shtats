@@ -92,9 +92,8 @@ impl GitStat for FilesByCommitsCollector {
 #[cfg(test)]
 mod tests {
     use crate::collectors::files_by_commits::{FilesByCommitsCollector, HIGHEST_COMMIT_NUMBER_NAME, LOWEST_COMMIT_NUMBER_NAME};
-    use crate::{GitCommit, GitStat};
     use crate::models::{FileOperation, GitCommit, Operation};
-    use crate::stats::JsonValue;
+    use crate::stats::{GitStat, JsonValue};
 
     #[test]
     fn sums_commits_per_file() {

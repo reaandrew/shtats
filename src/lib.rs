@@ -10,11 +10,11 @@ mod collectors;
 pub mod html;
 pub mod process;
 mod duplicates;
-mod errors;
+pub mod errors;
 mod result;
 pub mod config;
 pub mod cli;
-mod reporter;
+pub mod reporter;
 
 
 

@@ -58,7 +58,6 @@ impl GitStat for LinesByDayCollector {
 
 #[cfg(test)]
 mod tests{
-    use crate::{GitCommit, GitStat};
     use crate::collectors::lines_by_day::LinesByDayCollector;
     use crate::models::{GitCommit, LineStat};
     use crate::stats::{GitStat, JsonValue};

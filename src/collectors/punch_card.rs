@@ -57,10 +57,9 @@ impl GitStat for PunchCardCollector {
 
 #[cfg(test)]
 mod tests{
-    use crate::{GitCommit, GitStat};
     use crate::collectors::punch_card::PunchCardCollector;
     use crate::models::GitCommit;
-    use crate::stats::JsonValue;
+    use crate::stats::{GitStat, JsonValue};
 
     #[test]
     fn test_process(){

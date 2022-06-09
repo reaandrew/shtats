@@ -169,7 +169,6 @@ impl GitCommit {
 
 #[cfg(test)]
 mod commit_tests {
-    use crate::GitCommit;
     use crate::models::{GitCommit, LineStat};
 
     #[test]

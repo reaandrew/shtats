@@ -79,7 +79,6 @@ impl GitStat for FilesByLines{
 
 #[cfg(test)]
 mod tests{
-    use crate::{GitCommit, GitStat};
     use crate::collectors::files_by_lines::FilesByLines;
     use crate::models::{GitCommit, LineStat};
     use crate::stats::{GitStat, JsonValue};

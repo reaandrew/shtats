@@ -53,8 +53,8 @@ impl GitStat for CommitsByDayCollector {
 #[cfg(test)]
 mod tests{
     use crate::collectors::commits_by_day::CommitsByDayCollector;
-    use crate::{GitCommit, GitStat};
-    use crate::stats::JsonValue;
+    use crate::models::GitCommit;
+    use crate::stats::{GitStat, JsonValue};
 
     #[test]
     fn test_process(){

@@ -46,7 +46,6 @@ impl GitStat for CommitsByFileExtension {
 
 #[cfg(test)]
 mod tests{
-    use crate::{GitCommit, GitStat};
     use crate::collectors::commits_by_file_extension::CommitsByFileExtension;
     use crate::models::{FileOperation, GitCommit, Operation};
     use crate::stats::{GitStat, JsonValue};

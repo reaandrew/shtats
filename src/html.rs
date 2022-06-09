@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use ramhorns::Template;
 use ramhorns::Content;
 use crate::output::BufferedOutput;
@@ -24,6 +25,12 @@ pub struct HtmlReporter {
     output: BufferedOutput
 }
 
+impl Display for HtmlReporter{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.output.clone().to_string().as_str())
+    }
+}
+
 #[derive(Content)]
 struct Context{
     pub data: String
@@ -42,10 +49,6 @@ impl Reporter for HtmlReporter {
 
         self.output.write(rendered);
     }
-
-    fn to_string(&self) -> String {
-        return self.output.clone().to_string();
-    }
 }
 
 impl HtmlReporter {
@@ -61,7 +64,6 @@ impl HtmlReporter {
 #[cfg(test)]
 mod tests{
     use serde_json::{json, Value};
-    use crate::{ GitStatsJsonViewModel, Reporter};
     use crate::html::{HtmlReporter, HtmlTemplate};
     use crate::reporter::Reporter;
     use crate::viewmodel::{GitStatsJsonViewModel, GitStatsJsonViewModelItem, SummaryViewModelItem};
