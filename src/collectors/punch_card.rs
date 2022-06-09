@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use chrono::{Datelike, Timelike};
 use serde_json::{Error, Number};
-use crate::{GitCommit, GitStat};
-use crate::stats::{JsonValue, PunchStats};
+use crate::models::GitCommit;
+use crate::stats::{GitStat, JsonValue, PunchStats};
 use crate::viewmodel::{GitStatsJsonViewModelItem, PunchesValue};
 
 pub struct PunchCardCollector {
@@ -59,6 +59,7 @@ impl GitStat for PunchCardCollector {
 mod tests{
     use crate::{GitCommit, GitStat};
     use crate::collectors::punch_card::PunchCardCollector;
+    use crate::models::GitCommit;
     use crate::stats::JsonValue;
 
     #[test]

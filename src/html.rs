@@ -1,6 +1,8 @@
 use ramhorns::Template;
-use crate::{BufferedOutput, GitStatsJsonViewModel, Reporter};
 use ramhorns::Content;
+use crate::output::BufferedOutput;
+use crate::reporter::Reporter;
+use crate::viewmodel::GitStatsJsonViewModel;
 
 pub trait HtmlTemplate{
     fn get<'a>(&self) -> &'a str;
@@ -61,7 +63,8 @@ mod tests{
     use serde_json::{json, Value};
     use crate::{ GitStatsJsonViewModel, Reporter};
     use crate::html::{HtmlReporter, HtmlTemplate};
-    use crate::viewmodel::{GitStatsJsonViewModelItem, SummaryViewModelItem};
+    use crate::reporter::Reporter;
+    use crate::viewmodel::{GitStatsJsonViewModel, GitStatsJsonViewModelItem, SummaryViewModelItem};
 
     struct TestTemplate{
 

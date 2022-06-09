@@ -3,7 +3,6 @@ use std::io::{ BufReader, Read, Write};
 use std::path::Path;
 use std::process::{ChildStdout, Command, Stdio};
 use serde_json::{Value};
-use crate::{GitStat, GitStatsJsonViewModel, Reporter, result};
 use crate::collectors::commits_by_day::CommitsByDayCollector;
 use crate::collectors::commits_by_file_extension::CommitsByFileExtension;
 use crate::collectors::files_by_commits::FilesByCommitsCollector;
@@ -17,6 +16,10 @@ use crate::collectors::user_summary::UserSummaryCollector;
 use crate::config::Config;
 use crate::errors::{ErrorType, ShtatsError};
 use crate::parsers::{GitCommitIterator, StdoutGitLogReader};
+use crate::reporter::Reporter;
+use crate::result;
+use crate::stats::GitStat;
+use crate::viewmodel::GitStatsJsonViewModel;
 
 
 pub trait GitExecutor {

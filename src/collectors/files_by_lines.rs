@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use serde_json::Error;
-use crate::{GitCommit, GitStat, LineStats};
-use crate::stats::JsonValue;
+use crate::models::GitCommit;
+use crate::stats::{GitStat, JsonValue, LineStats};
 use crate::viewmodel::{GitStatsJsonViewModelItem, SummaryViewModelItem};
 
 const HIGHEST_LINES_ADDED_NAME: &str = "Highest number of lines added for a single commit";
@@ -81,8 +81,8 @@ impl GitStat for FilesByLines{
 mod tests{
     use crate::{GitCommit, GitStat};
     use crate::collectors::files_by_lines::FilesByLines;
-    use crate::models::{LineStat};
-    use crate::stats::JsonValue;
+    use crate::models::{GitCommit, LineStat};
+    use crate::stats::{GitStat, JsonValue};
 
     #[test]
     fn test_process(){

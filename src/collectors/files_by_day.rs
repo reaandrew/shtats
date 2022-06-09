@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use serde_json::{Error, Number};
-use crate::{GitCommit, GitStat};
+use crate::models::GitCommit;
 use crate::models::Operation::{Added, Copied, Deleted, Modified, PairingBroken, Renamed, TypeChanged, Unknown, Unmerged};
-use crate::stats::{FileStats, JsonValue};
+use crate::stats::{FileStats, GitStat, JsonValue};
 use crate::viewmodel::{FilesValue, GitStatsJsonViewModelItem};
 
 pub struct FilesByDayCollector {
@@ -88,7 +88,7 @@ impl GitStat for FilesByDayCollector {
 mod tests{
     use crate::{GitCommit, GitStat};
     use crate::collectors::files_by_day::FilesByDayCollector;
-    use crate::models::{FileOperation, Operation};
+    use crate::models::{FileOperation, GitCommit, Operation};
     use crate::stats::JsonValue;
 
     #[test]

@@ -1,5 +1,5 @@
 use serde_json::{Error};
-use crate::{GitCommit};
+use crate::models::GitCommit;
 use crate::viewmodel::GitStatsJsonViewModelItem;
 
 pub trait JsonValue{

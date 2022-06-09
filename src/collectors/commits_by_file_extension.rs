@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use serde_json::{Error, json, Number};
-use crate::{GitCommit, GitStat};
-use crate::stats::JsonValue;
+use crate::models::GitCommit;
+use crate::stats::{GitStat, JsonValue};
 use crate::viewmodel::GitStatsJsonViewModelItem;
 
 pub struct CommitsByFileExtension {
@@ -48,8 +48,8 @@ impl GitStat for CommitsByFileExtension {
 mod tests{
     use crate::{GitCommit, GitStat};
     use crate::collectors::commits_by_file_extension::CommitsByFileExtension;
-    use crate::models::{FileOperation, Operation};
-    use crate::stats::JsonValue;
+    use crate::models::{FileOperation, GitCommit, Operation};
+    use crate::stats::{GitStat, JsonValue};
 
     #[test]
     fn test_process(){

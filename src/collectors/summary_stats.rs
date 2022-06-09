@@ -1,6 +1,6 @@
 use serde_json::Error;
-use crate::{GitCommit, GitStat};
-use crate::stats::{JsonValue, SummaryStats};
+use crate::models::GitCommit;
+use crate::stats::{GitStat, JsonValue, SummaryStats};
 use crate::viewmodel::{GitStatsJsonViewModelItem, SummaryViewModelItem};
 
 #[derive(Clone)]
@@ -70,7 +70,7 @@ mod summary_stats_collector_tests {
     use chrono::{DateTime, Duration, Utc};
     use crate::{GitCommit, GitStat};
     use crate::collectors::summary_stats::SummaryStatsCollector;
-    use crate::models::{GitAuthor, LineStat};
+    use crate::models::{GitAuthor, GitCommit, LineStat};
 
     #[test]
     fn test_overall_commit_count_with_1_commit() {

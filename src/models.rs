@@ -170,7 +170,7 @@ impl GitCommit {
 #[cfg(test)]
 mod commit_tests {
     use crate::GitCommit;
-    use crate::models::LineStat;
+    use crate::models::{GitCommit, LineStat};
 
     #[test]
     fn test_commit_total_lines_added() {

@@ -1,7 +1,7 @@
 use bytesize::ByteSize;
 use serde_json::Error;
-use crate::{GitCommit, GitStat};
-use crate::stats::{JsonValue, MessageStats};
+use crate::models::GitCommit;
+use crate::stats::{GitStat, JsonValue, MessageStats};
 use crate::viewmodel::{GitStatsJsonViewModelItem, SummaryViewModelItem};
 
 pub struct MessagesCollector {
@@ -95,7 +95,8 @@ impl GitStat for MessagesCollector {
 mod tests{
     use crate::{GitCommit, GitStat};
     use crate::collectors::messages::MessagesCollector;
-    use crate::stats::JsonValue;
+    use crate::models::GitCommit;
+    use crate::stats::{GitStat, JsonValue};
 
     #[test]
     fn test_process(){

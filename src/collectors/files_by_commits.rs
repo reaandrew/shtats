@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use itertools::{max, min};
 use serde_json::{Error};
-use crate::{GitCommit, GitStat};
-use crate::stats::JsonValue;
+use crate::models::{GitCommit};
+use crate::stats::{GitStat, JsonValue};
 use crate::viewmodel::{GitStatsJsonViewModelItem, SummaryViewModelItem};
 
 const LOWEST_COMMIT_NUMBER_NAME: &str = "Lowest number of commits for a file";
@@ -93,7 +93,7 @@ impl GitStat for FilesByCommitsCollector {
 mod tests {
     use crate::collectors::files_by_commits::{FilesByCommitsCollector, HIGHEST_COMMIT_NUMBER_NAME, LOWEST_COMMIT_NUMBER_NAME};
     use crate::{GitCommit, GitStat};
-    use crate::models::{FileOperation, Operation};
+    use crate::models::{FileOperation, GitCommit, Operation};
     use crate::stats::JsonValue;
 
     #[test]

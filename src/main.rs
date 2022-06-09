@@ -2,7 +2,6 @@ use std::env;
 use std::path::Path;
 use std::process::exit;
 use shtats::html::{HtmlReporter, PreactTemplate};
-use shtats::output::BufferedOutput;
 use shtats::process::{get_number_of_commits, ProcessGitExecutor, Shtats};
 use indicatif::ProgressBar;
 use shtats::cli::Cli;

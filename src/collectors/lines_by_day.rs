@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use serde_json::{Error, Number};
-use crate::{GitCommit, GitStat, LineStats};
-use crate::stats::JsonValue;
+use crate::models::GitCommit;
+use crate::stats::{GitStat, JsonValue, LineStats};
 use crate::viewmodel::{GitStatsJsonViewModelItem, LinesValue};
 
 pub struct LinesByDayCollector {
@@ -60,8 +60,8 @@ impl GitStat for LinesByDayCollector {
 mod tests{
     use crate::{GitCommit, GitStat};
     use crate::collectors::lines_by_day::LinesByDayCollector;
-    use crate::models::LineStat;
-    use crate::stats::JsonValue;
+    use crate::models::{GitCommit, LineStat};
+    use crate::stats::{GitStat, JsonValue};
 
     #[test]
     fn test_process(){
