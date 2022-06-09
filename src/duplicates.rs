@@ -3,6 +3,7 @@ use itertools::Itertools;
 
 const MAX_POWERSET: usize = 10;
 
+#[allow(dead_code)]
 pub struct DuplicateInfo {
     pub duplicate: String,
     pub count: i32,
@@ -41,6 +42,7 @@ impl DuplicateDetector {
         }
     }
 
+    #[allow(dead_code)]
     pub fn results(&mut self) -> Vec<DuplicateInfo> {
         let mut return_data = Vec::<DuplicateInfo>::new();
 
