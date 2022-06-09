@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use serde_json::{Error, Number};
-use crate::{GitCommit, GitStat, LineStats};
-use crate::stats::JsonValue;
+use crate::models::GitCommit;
+use crate::stats::{GitStat, JsonValue, LineStats};
 use crate::viewmodel::{GitStatsJsonViewModelItem, LinesValue};
 
 pub struct LinesByDayCollector {
@@ -53,5 +53,41 @@ impl GitStat for LinesByDayCollector {
             });
         stat.added += commit.total_lines_added();
         stat.deleted += commit.total_lines_deleted();
+    }
+}
+
+#[cfg(test)]
+mod tests{
+    use crate::collectors::lines_by_day::LinesByDayCollector;
+    use crate::models::{GitCommit, LineStat};
+    use crate::stats::{GitStat, JsonValue};
+
+    #[test]
+    fn test_process(){
+        let mut subject = LinesByDayCollector::default();
+        let commit: GitCommit = GitCommit::default();
+        subject.process(&commit);
+
+        assert_eq!(subject.total_lines_by_day.len(), 1)
+    }
+
+    #[test]
+    fn test_json_viewmodel(){
+        let mut subject = LinesByDayCollector::default();
+        let mut commit: GitCommit = GitCommit::default();
+        commit.line_stats.push(LineStat{
+            lines_added: 1,
+            lines_deleted: 2,
+            file: "file1.rs".to_string()
+        });
+        commit.line_stats.push(LineStat{
+            lines_added: 2,
+            lines_deleted: 4,
+            file: "file2.rs".to_string()
+        });
+        subject.process(&commit);
+
+        let result = subject.get_json_viewmodel().unwrap();
+        assert_eq!(result.data.to_string(), "[[\"1970-01-01\",3,6]]");
     }
 }

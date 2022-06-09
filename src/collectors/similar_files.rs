@@ -1,7 +1,7 @@
 use serde_json::Error;
 use crate::duplicates::DuplicateDetector;
-use crate::{GitCommit, GitStat};
-use crate::stats::JsonValue;
+use crate::models::GitCommit;
+use crate::stats::{GitStat, JsonValue};
 use crate::viewmodel::GitStatsJsonViewModelItem;
 
 pub struct SimilarFilesChangingCollector {

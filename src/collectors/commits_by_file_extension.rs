@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use serde_json::{Error, json, Number};
-use crate::{GitCommit, GitStat};
-use crate::stats::JsonValue;
+use crate::models::GitCommit;
+use crate::stats::{GitStat, JsonValue};
 use crate::viewmodel::GitStatsJsonViewModelItem;
 
 pub struct CommitsByFileExtension {
@@ -41,5 +41,41 @@ impl GitStat for CommitsByFileExtension {
                 .or_insert(0);
             *stat += 1;
         }
+    }
+}
+
+#[cfg(test)]
+mod tests{
+    use crate::collectors::commits_by_file_extension::CommitsByFileExtension;
+    use crate::models::{FileOperation, GitCommit, Operation};
+    use crate::stats::{GitStat, JsonValue};
+
+    #[test]
+    fn test_process(){
+        let mut subject = CommitsByFileExtension::default();
+        let mut commit: GitCommit = GitCommit::default();
+        commit.file_operations.push(FileOperation{
+            op: Operation::Added,
+            file: "anything.rs".to_string(),
+            file_extension: ".rs".to_string()
+        });
+        subject.process(&commit);
+
+        assert_eq!(subject.data.len(), 1)
+    }
+
+    #[test]
+    fn test_json_viewmodel(){
+        let mut subject = CommitsByFileExtension::default();
+        let mut commit: GitCommit = GitCommit::default();
+        commit.file_operations.push(FileOperation{
+            op: Operation::Added,
+            file: "anything.rs".to_string(),
+            file_extension: ".rs".to_string()
+        });
+        subject.process(&commit);
+
+        let result = subject.get_json_viewmodel().unwrap();
+        assert_eq!(result.data.to_string(), "[{\"name\":\".rs\",\"value\":1}]");
     }
 }

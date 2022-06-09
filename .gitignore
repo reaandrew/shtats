@@ -9,3 +9,5 @@ index.html
 out.html
 *.log
 sample.html
+grcov*
+report/

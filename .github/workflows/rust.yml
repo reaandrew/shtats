@@ -1,4 +1,4 @@
-name: Rust
+name: shtats
 
 on:
   push:
@@ -53,8 +53,22 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: index.html
-      - name: Run tests
-        run: cargo test --verbose
+      - name: Run cargo-tarpaulin
+        uses: actions-rs/tarpaulin@v0.1
+        with:
+          version: '0.15.0'
+          args: '-- --test-threads 1'
+
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v1.0.2
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}
+
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v1
+        with:
+          name: code-coverage-report
+          path: cobertura.xml
 
   build:
     strategy:
@@ -64,12 +78,24 @@ jobs:
         include:
           - TARGET: x86_64-unknown-linux-gnu # tested in a debian container on a mac
             OS: ubuntu-latest
+            FILE: target/x86_64-unknown-linux-gnu/release/shtats
+            ARGS: --best --lzma
+            STRIP: true
           - TARGET: x86_64-unknown-linux-musl # test in an alpine container on a mac
             OS: ubuntu-latest
+            FILE: target/x86_64-unknown-linux-musl/release/shtats
+            ARGS: --best --lzma
+            STRIP: true
           - TARGET: x86_64-apple-darwin # tested on a mac, is not properly signed so there are security warnings
             OS: macos-latest
+            FILE: target/x86_64-apple-darwin/release/shtats
+            ARGS: --best --lzma
+            STRIP: true
           - TARGET: x86_64-pc-windows-gnu # tested on a windows machine
             OS: windows-latest
+            FILE: target/x86_64-pc-windows-gnu/release/shtats.exe
+            ARGS: --best --lzma
+            STRIP: true
     needs: test
     runs-on: ${{ matrix.OS }}
     env:
@@ -120,6 +146,12 @@ jobs:
         run: cargo build --release --verbose --target $TARGET
       - name: List target
         run: find ./target
+      - name: Compress binaries
+        uses: svenstaro/upx-action@v2
+        with:
+          file: ${{ matrix.FILE }}
+          args: ${{ matrix.ARGS }}
+          strip: ${{ matrix.STRIP }}
       - name: Compress
         run: |
           mkdir -p ./artifacts
@@ -135,7 +167,8 @@ jobs:
             TAG=$GITHUB_SHA
           fi
           mv ./target/$TARGET/release/$EXEC ./$EXEC
-          zip ./artifacts/$NAME-$TARGET-$TAG.zip $EXEC
+          
+          tar -czf ./artifacts/$NAME-$TARGET.tar.gz $EXEC
       - name: Archive artifact
         uses: actions/upload-artifact@v2
         with:
@@ -159,4 +192,4 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ./artifacts/*.zip
+          files: ./artifacts/*.tar.gz

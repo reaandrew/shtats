@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use itertools::{max, min};
 use serde_json::{Error};
-use crate::{GitCommit, GitStat};
-use crate::stats::JsonValue;
+use crate::models::{GitCommit};
+use crate::stats::{GitStat, JsonValue};
 use crate::viewmodel::{GitStatsJsonViewModelItem, SummaryViewModelItem};
 
 const LOWEST_COMMIT_NUMBER_NAME: &str = "Lowest number of commits for a file";
@@ -45,13 +45,6 @@ impl JsonValue for FilesByCommitsCollector {
         let files_with_lowest_commits = self.count_files_with_commits(lowest_commits);
         let highest_commits = self.get_highest_commits();
         let files_with_highest_commits =self.count_files_with_commits(highest_commits);
-
-        // let object = json!({
-        //     "lowest_number_of_commits": lowest_commits,
-        //     "with_lowest_commits": lowest_items,
-        //     "highest_number_of_commits": highest_commits,
-        //     "with_highest_commits": highest_items
-        // });
 
         let pluralize = |value:String, input: usize|->String{
             return if input > 1 {
@@ -99,9 +92,8 @@ impl GitStat for FilesByCommitsCollector {
 #[cfg(test)]
 mod tests {
     use crate::collectors::files_by_commits::{FilesByCommitsCollector, HIGHEST_COMMIT_NUMBER_NAME, LOWEST_COMMIT_NUMBER_NAME};
-    use crate::{GitCommit, GitStat};
-    use crate::models::{FileOperation, Operation};
-    use crate::stats::JsonValue;
+    use crate::models::{FileOperation, GitCommit, Operation};
+    use crate::stats::{GitStat, JsonValue};
 
     #[test]
     fn sums_commits_per_file() {

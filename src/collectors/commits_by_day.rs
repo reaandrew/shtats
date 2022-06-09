@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use serde_json::{Error, Number};
-use crate::{GitCommit, GitStat};
-use crate::stats::JsonValue;
+use crate::models::{GitCommit};
+use crate::stats::{GitStat, JsonValue};
 use crate::viewmodel::{GitStatsJsonViewModelItem, KeyValue};
 
 pub struct CommitsByDayCollector {
@@ -47,5 +47,31 @@ impl GitStat for CommitsByDayCollector {
         let stat = self.total_commits_by_day.entry(commit.day_key())
             .or_insert(0);
         *stat += 1;
+    }
+}
+
+#[cfg(test)]
+mod tests{
+    use crate::collectors::commits_by_day::CommitsByDayCollector;
+    use crate::models::GitCommit;
+    use crate::stats::{GitStat, JsonValue};
+
+    #[test]
+    fn test_process(){
+        let mut subject = CommitsByDayCollector::default();
+        let commit: GitCommit = GitCommit::default();
+        subject.process(&commit);
+
+        assert_eq!(subject.total_commits_by_day.len(), 1)
+    }
+
+    #[test]
+    fn test_json_viewmodel(){
+        let mut subject = CommitsByDayCollector::default();
+        let commit: GitCommit = GitCommit::default();
+        subject.process(&commit);
+
+        let result = subject.get_json_viewmodel().unwrap();
+        assert_eq!(result.data.to_string(), "[[\"1970-01-01\",1]]");
     }
 }

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use serde_json::Error;
-use crate::{GitCommit, GitStat, LineStats};
-use crate::stats::JsonValue;
+use crate::models::GitCommit;
+use crate::stats::{GitStat, JsonValue, LineStats};
 use crate::viewmodel::{GitStatsJsonViewModelItem, SummaryViewModelItem};
 
 const HIGHEST_LINES_ADDED_NAME: &str = "Highest number of lines added for a single commit";
@@ -74,5 +74,53 @@ impl GitStat for FilesByLines{
             stat.added += operation.lines_added;
             stat.deleted += operation.lines_deleted;
         }
+    }
+}
+
+#[cfg(test)]
+mod tests{
+    use crate::collectors::files_by_lines::FilesByLines;
+    use crate::models::{GitCommit, LineStat};
+    use crate::stats::{GitStat, JsonValue};
+
+    #[test]
+    fn test_process(){
+        let mut subject = FilesByLines::default();
+        let mut commit: GitCommit = GitCommit::default();
+        commit.line_stats.push(LineStat{
+            lines_added: 1,
+            lines_deleted: 2,
+            file: "file1.rs".to_string()
+        });
+        commit.line_stats.push(LineStat{
+            lines_added: 2,
+            lines_deleted: 4,
+            file: "file2.rs".to_string()
+        });
+        subject.process(&commit);
+
+        assert_eq!(subject.most_churn_single_commit, 6);
+        assert_eq!(subject.most_lines_added_single_commit, 2);
+        assert_eq!(subject.most_lines_deleted_single_commit, 4);
+    }
+
+    #[test]
+    fn test_json_viewmodel(){
+        let mut subject = FilesByLines::default();
+        let mut commit: GitCommit = GitCommit::default();
+        commit.line_stats.push(LineStat{
+            lines_added: 1,
+            lines_deleted: 2,
+            file: "file1.rs".to_string()
+        });
+        commit.line_stats.push(LineStat{
+            lines_added: 2,
+            lines_deleted: 4,
+            file: "file2.rs".to_string()
+        });
+        subject.process(&commit);
+
+        let result = subject.get_json_viewmodel().unwrap();
+        assert_eq!(result.summary.len(), 3);
     }
 }

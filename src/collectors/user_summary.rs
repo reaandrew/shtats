@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use itertools::Itertools;
 use serde_json::{Error, json, Number};
-use crate::{GitCommit, GitStat};
-use crate::stats::JsonValue;
+use crate::models::GitCommit;
+use crate::stats::{GitStat, JsonValue};
 use crate::viewmodel::{GitStatsJsonViewModelItem, KeyValue};
 
 pub struct UserStats {
