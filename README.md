@@ -1,5 +1,7 @@
 # shtats
 
+[![shtats](https://github.com/reaandrew/shtats/workflows/shtats/badge.svg)](https://github.com/reaandrew/shtats/actions)
+
 [![codecov](https://codecov.io/gh/reaandrew/shtats/branch/main/graph/badge.svg?token=QQ1U61LTF9)](https://codecov.io/gh/reaandrew/shtats)
 
 A tool to visualise stats from GIT.
