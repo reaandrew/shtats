@@ -37,7 +37,7 @@ struct Context{
 }
 
 impl Reporter for HtmlReporter {
-    fn write(&mut self, stats: GitStatsJsonViewModel) {
+    fn write(&mut self, stats: &GitStatsJsonViewModel) {
         let data_template="const viewmodel = {{{data}}}";
 
         let json_value = serde_json::to_string(&stats).unwrap();

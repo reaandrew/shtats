@@ -1,8 +1,9 @@
 use std::fs::File;
-use std::io::{ BufReader, Read, Write};
+use std::io::{BufRead, BufReader, Read, Write};
 use std::path::Path;
 use std::process::{ChildStdout, Command, Stdio};
 use serde_json::{Value};
+use statrs::statistics::{Data, Distribution, Max, Median, Min, OrderStatistics};
 use crate::collectors::commits_by_day::CommitsByDayCollector;
 use crate::collectors::commits_by_file_extension::CommitsByFileExtension;
 use crate::collectors::files_by_commits::FilesByCommitsCollector;
@@ -116,7 +117,10 @@ impl Shtats<'_, '_> {
             viewmodel.summary.extend(summaries);
             viewmodel.data.insert(json_viewmodel.key, json_viewmodel.data);
         }
-        self.reporter.write(viewmodel);
+
+        self.calculate_sizing(&mut viewmodel);
+
+        self.reporter.write(&viewmodel);
 
         let report_path = Path::new(&self.config.output);
         let display = path.display();
@@ -132,6 +136,57 @@ impl Shtats<'_, '_> {
         }
 
         Ok(())
+    }
+
+    fn calculate_sizing(&self, _viewmodel: &mut GitStatsJsonViewModel){
+        let mut dest = Command::new("git")
+            .args(vec!["cat-file","--batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)'"])
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .spawn()
+            .unwrap();
+        let _source = Command::new("git")
+            .args(vec!["rev-list","--all","--objects"])
+            .stdout(dest.stdin.take().unwrap())
+            .spawn()
+            .unwrap();
+        let dest_output = dest.stdout.unwrap();
+        let mut buffer = String::new();
+        let mut buf_reader = BufReader::new(dest_output);
+        let mut sizes: Vec<f64> = Vec::new();
+        loop {
+            buffer.clear();
+            let res = buf_reader.read_line(&mut buffer);
+            if res.is_err() || res.unwrap() == 0 {
+                break;
+            }
+            let line = buffer.clone();
+            let elements = line.split_whitespace()
+                .collect::<Vec<&str>>()
+                .iter()
+                .map(|&x|x.trim_matches(&['\''] as &[_]))
+                .collect::<Vec<&str>>();
+
+            if  elements[0] == "blob"{
+                sizes.push(elements[2].parse().unwrap())
+            }
+
+            //println!("{} {} {}", elements[0], elements[2], elements[3]);
+        }
+        let mut y = Data::new(sizes.clone());
+        println!("0P {}", y.percentile(0));
+        println!("25P {}", y.percentile(25));
+        println!("50P {}",y.percentile(50));
+        println!("75P {}", y.percentile(75));
+        println!("95P {}", y.percentile(95));
+        println!("100P {}", y.percentile(100));
+        println!("MIN {}", y.min());
+        println!("MAX {}", y.max());
+        println!("MEAN {}", y.mean().unwrap());
+        println!("MEDIAN {}", y.median());
+        let sum: f64 = sizes.clone().iter().sum();
+        println!("SUM {}", sum);
+        println!("DONE");
     }
 
     fn create_stat_collectors(&self) -> Vec<Box<dyn GitStat>> {

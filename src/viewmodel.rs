@@ -48,6 +48,15 @@ pub struct GitStatsJsonViewModel {
     pub(crate) data: HashMap<String, Value>
 }
 
+// impl GitStatsJsonViewModel{
+//     fn merge(&self, other: GitStatsJsonViewModel) -> GitStatsJsonViewModel{
+//         return GitStatsJsonViewModel{
+//             summary: self.summary.clone().into_iter().chain(other.summary.into_iter()).collect(),
+//             data: self.data.clone().into_iter().chain(other.data).collect(),
+//         }
+//     }
+// }
+
 #[derive(Default)]
 pub struct GitStatsJsonViewModelItem {
     pub(crate) summary: Vec<SummaryViewModelItem>,
