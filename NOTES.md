@@ -10,6 +10,27 @@ git rev-list --all --objects | \
   numfmt --field 3 --to=iec
 ```
 
+## Piping using rust
+
+```rust
+let mut dest = Command::new("wc")
+    .stdin(Stdio::piped())
+    .stdout(Stdio::piped())
+    .spawn()
+    .unwrap();
+let _source = Command::new("ls")
+    .stdout(dest.stdin.take().unwrap())
+    .spawn()
+    .unwrap();
+let dest_output = dest.wait_with_output().unwrap();
+
+match dest_output.status.code() {
+Some(0) => println!("OK: {}", String::from_utf8_lossy(&dest_output.stdout)),
+Some(code) => println!("Error {}", code),
+None => {}
+}
+```
+
 ## Heat map for commits
 
 [Based on this link from echarts but with modifications for horizontal and spacing](https://echarts.apache.org/examples/en/editor.html?c=calendar-vertical)
