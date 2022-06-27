@@ -10,4 +10,7 @@ out.html
 *.log
 sample.html
 grcov*
-report/
+report/IDE-config.txt
+report/IDE-config/
+report/copy-paste/
+
