@@ -1,4 +1,6 @@
+const fs = require('fs');
 const path = require('path');
+const tmp = require("tmp");
 const puppeteer = require('puppeteer');
 
 
@@ -11,7 +13,10 @@ const puppeteer = require('puppeteer');
         height: 1000,
     });
     await page.goto('file:///'+reportPath);
-    await page.screenshot({path: '/tmp/report-screenshot.png', fullPage: true});
 
+    const tmpobj = tmp.fileSync({postfix: '.png'});
+    await page.screenshot({path: tmpobj.name, fullPage: true});
     await browser.close();
+    fs.renameSync(tmpobj.name, "./docs/images/shtats_thumbnail.png")
+
 })();

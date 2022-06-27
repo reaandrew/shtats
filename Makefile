@@ -25,4 +25,4 @@ test: index.html grcov
 .PHONY: update_report_screenshot
 update_report_screenshot:
 	npm install -d
-	bash ./scripts/update-screenshot.sh
+	node ./scripts/take-screenshot.js
