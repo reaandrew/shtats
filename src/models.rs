@@ -1,7 +1,8 @@
 use std::str::FromStr;
-use chrono::{DateTime, FixedOffset};
+use chrono::{Datelike, DateTime, FixedOffset};
 #[cfg(test)]
 use std::fmt::{Display, Formatter};
+use std::ops::Add;
 #[cfg(test)]
 use mockall::Any;
 #[cfg(test)]
@@ -79,6 +80,7 @@ impl Default for GitCommit {
     }
 }
 
+
 #[cfg(test)]
 impl Display for GitCommit {
     #[cfg(test)]
@@ -141,6 +143,19 @@ impl GitCommit {
         return self.date.format("%Y-%m-%d").to_string();
     }
 
+    pub(crate) fn month_key(&self) -> String {
+        return self.date.format("%Y-%m").to_string();
+    }
+
+    pub(crate) fn hour_key(&self) -> String{
+        return self.date.format("%Y-%m-%d %H").to_string();
+    }
+
+    pub(crate) fn week_key(&self) -> String{
+        let week = self.date.iso_week().week();
+        return self.date.format("%Y ").to_string().add(week.to_string().as_str())
+    }
+
     pub(crate) fn hour_key_by_weekday(&self) -> String {
         return self.date.format("%w-%H").to_string();
     }
@@ -188,6 +203,75 @@ mod commit_tests {
         assert_eq!(8, commit.total_lines_deleted());
     }
 }
+
+#[cfg(test)]
+pub struct GitCommitBuilder{
+    commit: GitCommit
+}
+
+#[cfg(test)]
+impl GitCommitBuilder{
+    pub(crate) fn new() -> GitCommitBuilder{
+        return GitCommitBuilder{ commit: Default::default() }
+    }
+
+    pub(crate) fn with_lines(mut self, added:i32, deleted: i32, file: &str) -> GitCommitBuilder{
+        self.commit.line_stats.push(LineStat{
+            lines_added: added,
+            lines_deleted: deleted,
+            file: file.to_string()
+        });
+        return self;
+    }
+
+
+    pub(crate) fn for_date(mut self, date: &str)-> GitCommitBuilder{
+        let date_value = date.to_owned() + "00:00:00 +00:00";
+        self.commit.date = DateTime::parse_from_str(date_value.as_str(), "%Y-%m-%d %H:%M:%S %z").unwrap();
+        return self;
+    }
+
+    pub(crate) fn for_date_time(mut self, date: &str)-> GitCommitBuilder{
+        let date_value = date.to_owned() + " +00:00";
+        self.commit.date = DateTime::parse_from_str(date_value.as_str(), "%Y-%m-%d %H:%M:%S %z").unwrap();
+        return self;
+    }
+
+    pub(crate) fn build(self) -> GitCommit{
+        return self.commit.clone();
+    }
+}
+
+#[cfg(test)]
+mod commit_builder_tests{
+    use chrono::DateTime;
+    use crate::models::GitCommitBuilder;
+
+    #[test]
+    fn test_with_lines(){
+        let commit = GitCommitBuilder::new()
+            .with_lines(1,2,"something.rs")
+            .build();
+        assert_eq!(commit.line_stats.len(), 1);
+        assert_eq!(commit.line_stats[0].lines_added, 1);
+        assert_eq!(commit.line_stats[0].lines_deleted,2);
+        assert_eq!(commit.line_stats[0].file, "something.rs");
+    }
+
+    #[test]
+    fn test_for_date(){
+        let date_value = "2022-01-01 00:00:00 +00:00";
+        let date = DateTime::parse_from_str(date_value, "%Y-%m-%d %H:%M:%S %z").unwrap();
+        //assert_eq!(DateTime::parse_from_rfc2822("Wed, 2 Feb 2022 12:02:17 +0000").unwrap(), actual);
+
+        let commit = GitCommitBuilder::new()
+            .for_date("2022-01-01")
+            .build();
+
+        assert_eq!(commit.date, date);
+    }
+}
+
 
 #[cfg(test)]
 mod tests {

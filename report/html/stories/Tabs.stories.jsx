@@ -7,7 +7,7 @@ import Tabs from "../components/tabs";
 import {generate_commit_data} from "./utils";
 
 export default {
-    title: 'Shtats/tabs',
+    title: 'Shtats/Tabs',
     component:Tabs,
 };
 
