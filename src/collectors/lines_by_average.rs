@@ -198,6 +198,6 @@ mod tests {
         let result = subject.get_json_viewmodel().unwrap();
         //TODO: Create a struct for the result, deserialize the result and assert on the struct
         //      This applies to all types of assertions like this.
-        assert_eq!(result.data.to_string(), "{\"commit\":{\"added\":2.0,\"churn\":10.0,\"deleted\":8.0},\"day\":{\"added\":0.26,\"churn\":1.32,\"deleted\":1.06},\"hour\":{\"added\":0.01,\"churn\":0.05,\"deleted\":0.04},\"month\":{\"added\":null,\"churn\":null,\"deleted\":null},\"week\":{\"added\":2.0,\"churn\":10.0,\"deleted\":8.0}}");
+        assert_eq!(result.data.to_string(), "{\"commit\":{\"added\":2.0,\"churn\":10.0,\"deleted\":8.0},\"day\":{\"added\":0.0,\"churn\":1.0,\"deleted\":1.0},\"hour\":{\"added\":0.0,\"churn\":0.0,\"deleted\":0.0},\"month\":{\"added\":null,\"churn\":null,\"deleted\":null},\"week\":{\"added\":2.0,\"churn\":10.0,\"deleted\":8.0}}");
     }
 }
