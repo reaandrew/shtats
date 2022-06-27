@@ -30,6 +30,12 @@ pub struct LineStats {
 }
 
 #[derive(Default, Clone, PartialEq)]
+pub struct LineStatsAverage {
+    pub(crate) avg_added: f64,
+    pub(crate) avg_deleted: f64,
+}
+
+#[derive(Default, Clone, PartialEq)]
 pub struct FileStats {
     pub(crate) added: i32,
     pub(crate) modified: i32,

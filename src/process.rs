@@ -8,6 +8,7 @@ use crate::collectors::commits_by_file_extension::CommitsByFileExtension;
 use crate::collectors::files_by_commits::FilesByCommitsCollector;
 use crate::collectors::files_by_day::FilesByDayCollector;
 use crate::collectors::files_by_lines::FilesByLines;
+use crate::collectors::lines_by_average::LinesByAverageCollector;
 use crate::collectors::lines_by_day::LinesByDayCollector;
 use crate::collectors::messages::MessagesCollector;
 use crate::collectors::punch_card::PunchCardCollector;
@@ -18,7 +19,7 @@ use crate::errors::{ErrorType, ShtatsError};
 use crate::parsers::{GitCommitIterator, StdoutGitLogReader};
 use crate::reporter::Reporter;
 use crate::result;
-use crate::stats::GitStat;
+use crate::stats::{GitStat, LineStatsAverage};
 use crate::viewmodel::GitStatsJsonViewModel;
 
 
@@ -147,6 +148,7 @@ impl Shtats<'_, '_> {
             Box::new(FilesByLines::default()),
             Box::new(CommitsByFileExtension::default()),
             Box::new(UserSummaryCollector::default()),
+            Box::new(LinesByAverageCollector::default())
         ];
         stats_functions
     }
