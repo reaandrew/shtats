@@ -17,8 +17,8 @@ pub struct KeyValue {
 #[derive(Serialize)]
 pub struct LinesValue{
     pub(crate) key: String,
-    pub(crate) lines_added: i32,
-    pub(crate) lines_deleted: i32
+    pub(crate) lines_added: i64,
+    pub(crate) lines_deleted: i64
 }
 
 #[derive(Serialize)]

@@ -9,6 +9,7 @@ use crate::collectors::files_by_commits::FilesByCommitsCollector;
 use crate::collectors::files_by_day::FilesByDayCollector;
 use crate::collectors::files_by_lines::FilesByLines;
 use crate::collectors::lines_by_average::LinesByAverageCollector;
+use crate::collectors::lines_by_average_by_file_extension::LinesByAverageByFileExtensionCollector;
 use crate::collectors::lines_by_day::LinesByDayCollector;
 use crate::collectors::messages::MessagesCollector;
 use crate::collectors::punch_card::PunchCardCollector;
@@ -148,7 +149,8 @@ impl Shtats<'_, '_> {
             Box::new(FilesByLines::default()),
             Box::new(CommitsByFileExtension::default()),
             Box::new(UserSummaryCollector::default()),
-            Box::new(LinesByAverageCollector::default())
+            Box::new(LinesByAverageCollector::default()),
+            Box::new(LinesByAverageByFileExtensionCollector::default())
         ];
         stats_functions
     }

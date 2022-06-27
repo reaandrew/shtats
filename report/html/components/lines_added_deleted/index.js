@@ -18,7 +18,8 @@ function lines_added_vs_deleted(element, added, deleted) {
             {
                 type: 'time', gridIndex: 1
             }],
-        yAxis: [{gridIndex: 0, name: "Added"}, {
+        yAxis: [{gridIndex: 0, name: "Added", type: 'log'}, {
+            type: 'log',
             gridIndex: 1,
             name: "Deleted",
             inverse: true,

@@ -54,23 +54,16 @@ function generate_data(language_count){
 export const WithNoData = Template.bind({});
 WithNoData.args = {
     data: {
-        group: "day",
         stats: []
     },
 };
 
 export const WithSomeData = Template.bind({});
 WithSomeData.args = {
-    data: {
-        group: "day",
-        stats: generate_data(25)
-    },
+    data: generate_data(25)
 };
 
 export const WithLotsOfData = Template.bind({});
 WithLotsOfData.args = {
-    data: {
-        group: "day",
-        stats: generate_data(100)
-    },
+    data: generate_data(100)
 };

@@ -5,7 +5,8 @@ import {line_chart} from "../../utils/echarts";
 
 
 export default function LinesAddedDeletedByLanguage({data}) {
-    function draw(s) {
+    console.log('DATA for LinesAddedDeletedByLanguage', data)
+    function draw(s, data) {
         var chartDom = document.getElementById(s);
         var myChart = echarts.init(chartDom);
         var option;
@@ -14,7 +15,7 @@ export default function LinesAddedDeletedByLanguage({data}) {
         let data1 = [];
         let data2 = [];
 
-        data.stats.sort((a, b) => {
+        data.sort((a, b) => {
             return b[2] + b[1] > a[2] + a[1] ? 1 // if b should come earlier, push a to end
                 : b[2] + b[1] < a[2] + a[1] ? -1 // if b should come later, push a to begin
                     : 0;
@@ -35,9 +36,12 @@ export default function LinesAddedDeletedByLanguage({data}) {
                 splitLine: {show: false},
                 splitArea: {show: false}
             },
-            yAxis: {},
+            yAxis: {type: 'log',},
             grid: {
-                bottom: 100
+                left: 100,
+                top: 50,
+                right: 50,
+                bottom: 50
             },
             series: [
                 {
@@ -77,14 +81,14 @@ export default function LinesAddedDeletedByLanguage({data}) {
     }
 
     useEffect(() => {
-        draw("lines_added_deleted_by_language_" + data.group);
+        draw("lines_added_deleted_by_language", data);
     }, []);
 
     return (
         <div className="row">
             <div className="col">
                 <h2>Average Lines Added vs. Deleted by Language per commit</h2>
-                <div id={"lines_added_deleted_by_language_" + data.group} className="col chart"/>
+                <div id={"lines_added_deleted_by_language"} className="col chart"/>
             </div>
         </div>
     )

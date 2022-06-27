@@ -51,8 +51,8 @@ impl GitStat for LinesByDayCollector {
                 added: 0,
                 deleted: 0,
             });
-        stat.added += commit.total_lines_added();
-        stat.deleted += commit.total_lines_deleted();
+        stat.added += commit.total_lines_added() as i64;
+        stat.deleted += commit.total_lines_deleted() as i64;
     }
 }
 
