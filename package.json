@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "puppeteer": "^15.1.1",
+    "tmp": "^0.2.1"
+  }
+}

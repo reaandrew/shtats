@@ -22,3 +22,7 @@ test: index.html grcov
 	cargo test
 	grcov . -s . --binary-path ./target/debug/ -t html --branch --ignore-not-existing -o ./target/debug/coverage/
 
+.PHONY: update_report_screenshot
+update_report_screenshot:
+	npm install -d
+	node ./scripts/take-screenshot.js
