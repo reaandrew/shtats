@@ -42,8 +42,8 @@ impl LinesByAverageCollector {
         let avg_deleted = total_deleted / divisor;
 
         return LineStatsAverage{
-            avg_added: f64::trunc(avg_added  * 100.0).round() / 100.0,
-            avg_deleted: f64::trunc(avg_deleted  * 100.0).round() / 100.0
+            avg_added: (f64::trunc(avg_added  * 100.0) / 100.0).round(),
+            avg_deleted: (f64::trunc(avg_deleted  * 100.0) / 100.0).round()
         }
     }
 
@@ -73,8 +73,8 @@ impl LinesByAverageCollector {
         let added =  (self.by_commit_total.added / self.total_commits) as f64;
         let deleted = (self.by_commit_total.deleted / self.total_commits) as f64;
         return LineStatsAverage{
-            avg_added: f64::trunc(added  * 100.0).round() / 100.0,
-            avg_deleted: f64::trunc(deleted  * 100.0).round() / 100.0,
+            avg_added: (f64::trunc(added  * 100.0) / 100.0).round(),
+            avg_deleted: (f64::trunc(deleted  * 100.0) / 100.0).round()
         }
     }
 }
