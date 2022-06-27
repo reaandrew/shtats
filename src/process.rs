@@ -19,7 +19,7 @@ use crate::errors::{ErrorType, ShtatsError};
 use crate::parsers::{GitCommitIterator, StdoutGitLogReader};
 use crate::reporter::Reporter;
 use crate::result;
-use crate::stats::{GitStat, LineStatsAverage};
+use crate::stats::{GitStat};
 use crate::viewmodel::GitStatsJsonViewModel;
 
 
