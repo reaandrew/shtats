@@ -1,8 +1,10 @@
+use std::ffi::OsStr;
 use std::str::FromStr;
 use chrono::{Datelike, DateTime, FixedOffset};
 #[cfg(test)]
 use std::fmt::{Display, Formatter};
 use std::ops::Add;
+use std::path::Path;
 #[cfg(test)]
 use mockall::Any;
 #[cfg(test)]
@@ -46,6 +48,30 @@ pub(crate) struct LineStat {
     pub(crate) lines_added: i32,
     pub(crate) lines_deleted: i32,
     pub(crate) file: String,
+}
+
+impl LineStat{
+    pub(crate) fn extension(&self) -> String{
+        let extension = String::from(Path::new(self.file.as_str())
+            .extension()
+            .and_then(OsStr::to_str).unwrap_or(""));
+        return extension;
+    }
+}
+
+#[cfg(test)]
+mod line_stat_tests{
+    use crate::models::LineStat;
+
+    #[test]
+    fn test_extension(){
+        let subject = LineStat{
+            lines_added: 0,
+            lines_deleted: 0,
+            file: "something.rs".to_string()
+        };
+        assert_eq!("rs", subject.extension());
+    }
 }
 
 #[derive(Clone, PartialEq)]

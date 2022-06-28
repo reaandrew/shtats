@@ -70,8 +70,8 @@ impl LinesByAverageCollector {
     }
 
     fn calculate_by_commit(&self) -> LineStatsAverage{
-        let added =  (self.by_commit_total.added / self.total_commits) as f64;
-        let deleted = (self.by_commit_total.deleted / self.total_commits) as f64;
+        let added =  (self.by_commit_total.added / self.total_commits as i64) as f64;
+        let deleted = (self.by_commit_total.deleted / self.total_commits as i64) as f64;
         return LineStatsAverage{
             avg_added: (f64::trunc(added  * 100.0) / 100.0).round(),
             avg_deleted: (f64::trunc(deleted  * 100.0) / 100.0).round()
@@ -133,35 +133,35 @@ impl GitStat for LinesByAverageCollector {
                 added: 0,
                 deleted: 0,
             });
-        hour_stat.added += commit.total_lines_added();
-        hour_stat.deleted += commit.total_lines_deleted();
+        hour_stat.added += commit.total_lines_added() as i64;
+        hour_stat.deleted += commit.total_lines_deleted() as i64;
         
         let day_stat = self.by_day.entry(commit.day_key())
             .or_insert(LineStats {
                 added: 0,
                 deleted: 0,
             });
-        day_stat.added += commit.total_lines_added();
-        day_stat.deleted += commit.total_lines_deleted();
+        day_stat.added += commit.total_lines_added() as i64;
+        day_stat.deleted += commit.total_lines_deleted() as i64;
 
         let week_stat = self.by_week.entry(commit.week_key())
             .or_insert(LineStats {
                 added: 0,
                 deleted: 0,
             });
-        week_stat.added += commit.total_lines_added();
-        week_stat.deleted += commit.total_lines_deleted();
+        week_stat.added += commit.total_lines_added() as i64;
+        week_stat.deleted += commit.total_lines_deleted() as i64;
 
         let month_stat = self.by_month.entry(commit.month_key())
             .or_insert(LineStats {
                 added: 0,
                 deleted: 0,
             });
-        month_stat.added += commit.total_lines_added();
-        month_stat.deleted += commit.total_lines_deleted();
+        month_stat.added += commit.total_lines_added() as i64;
+        month_stat.deleted += commit.total_lines_deleted() as i64;
 
-        self.by_commit_total.added += commit.total_lines_added();
-        self.by_commit_total.deleted += commit.total_lines_deleted();
+        self.by_commit_total.added += commit.total_lines_added() as i64;
+        self.by_commit_total.deleted += commit.total_lines_deleted() as i64;
         self.total_commits += 1
     }
 }

@@ -10,3 +10,4 @@ pub mod files_by_lines;
 pub mod commits_by_file_extension;
 pub mod user_summary;
 pub mod lines_by_average;
+pub mod lines_by_average_by_file_extension;

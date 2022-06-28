@@ -44,6 +44,11 @@ With30DaysOfData.args = {
                 deleted: 2,
                 churn: 3
             }
-        }
+        },
+        avg_line_stats_by_file_extension:[
+            ["js", 50, 100],
+            ["rs", 500, 700],
+            ["py", 350, 60]
+        ]
     }
 };

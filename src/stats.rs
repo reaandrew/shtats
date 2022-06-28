@@ -25,8 +25,8 @@ pub struct SummaryStats {
 
 #[derive(Default, Clone, PartialEq)]
 pub struct LineStats {
-    pub(crate) added: i32,
-    pub(crate) deleted: i32,
+    pub(crate) added: i64,
+    pub(crate) deleted: i64,
 }
 
 #[derive(Default, Clone, PartialEq)]

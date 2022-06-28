@@ -4,6 +4,18 @@ index.html:
 		parcel build index.html && \
 		cp dist/index.html ../../)
 
+.PHONY: debug_build
+debug_build:
+	rm index.html
+	(cd report/html && \
+			npm install -d && \
+			parcel build --no-optimize index.html && \
+			cp dist/index.html ../../)
+	cargo build
+	./target/debug/shtats run
+	firefox report.html
+
+
 grcov:
 	curl -LO https://github.com/mozilla/grcov/releases/download/v0.8.7/grcov-x86_64-unknown-linux-gnu.tar.bz2
 	tar -xf grcov-x86_64-unknown-linux-gnu.tar.bz2

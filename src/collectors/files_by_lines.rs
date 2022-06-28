@@ -71,8 +71,8 @@ impl GitStat for FilesByLines{
                     added: 0,
                     deleted: 0,
                 });
-            stat.added += operation.lines_added;
-            stat.deleted += operation.lines_deleted;
+            stat.added += operation.lines_added as i64;
+            stat.deleted += operation.lines_deleted as i64;
         }
     }
 }
