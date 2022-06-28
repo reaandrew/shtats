@@ -5,17 +5,16 @@ import {line_chart} from "../../utils/echarts";
 
 
 export default function LinesAddedDeletedByLanguage({data}) {
-    console.log('DATA for LinesAddedDeletedByLanguage', data)
     function draw(s, data) {
-        var chartDom = document.getElementById(s);
-        var myChart = echarts.init(chartDom);
-        var option;
+        const chartDom = document.getElementById(s);
+        const myChart = echarts.init(chartDom);
+        let option;
 
         let xAxisData = [];
         let data1 = [];
         let data2 = [];
 
-        data.sort((a, b) => {
+        data.filter((a) => a[1] > 1 || a[2] > 1).sort((a, b) => {
             return b[2] + b[1] > a[2] + a[1] ? 1 // if b should come earlier, push a to end
                 : b[2] + b[1] < a[2] + a[1] ? -1 // if b should come later, push a to begin
                     : 0;
@@ -34,9 +33,16 @@ export default function LinesAddedDeletedByLanguage({data}) {
                 data: xAxisData,
                 axisLine: {onZero: true},
                 splitLine: {show: false},
-                splitArea: {show: false}
+                splitArea: {show: false},
+                axisLabel: {
+                    interval: 0,
+                    rotate: 30 //If the label names are too long you can manage this by rotating the label.
+                }
             },
-            yAxis: {type: 'log',},
+            yAxis: {
+                type: 'log',
+             min: 1
+        },
             grid: {
                 left: 100,
                 top: 50,
@@ -56,7 +62,7 @@ export default function LinesAddedDeletedByLanguage({data}) {
                 {
                     name: 'deleted',
                     type: 'bar',
-                    stack: 'one',
+                    stack: 'two',
                     data: data2,
                     itemStyle: {
                         color: '#fd0e35'
@@ -78,6 +84,12 @@ export default function LinesAddedDeletedByLanguage({data}) {
         });
 
         option && myChart.setOption(option);
+
+        window.addEventListener('resize', function () {
+            if (myChart != null) {
+                myChart.resize();
+            }
+        });
     }
 
     useEffect(() => {

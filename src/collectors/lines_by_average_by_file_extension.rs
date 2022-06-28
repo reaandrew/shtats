@@ -39,8 +39,8 @@ impl GitStat for LinesByAverageByFileExtensionCollector {
                     added: 0,
                     deleted: 0,
                 });
-            extension_stat.added += commit.total_lines_added() as i64;
-            extension_stat.deleted += commit.total_lines_deleted() as i64;
+            extension_stat.added += line_stats.lines_added as i64;
+            extension_stat.deleted += line_stats.lines_deleted as i64;
         }
 
         self.total_commits += 1
@@ -86,28 +86,31 @@ mod tests {
         subject.process(&GitCommitBuilder::new()
             .for_date_time("2022-01-01 12:00:00")
             .with_lines(2, 12, "1.txt")
+            .with_lines(4, 6, "1.js")
             .build());
         subject.process(&GitCommitBuilder::new()
-            .for_date_time("2022-01-16 18:00:00")
-            .with_lines(2, 4, "1.js")
+            .for_date_time("2022-01-3 18:00:00")
+            .with_lines(2, 12, "1.txt")
+            .with_lines(4, 6, "1.js")
             .build());
 
         let result = subject.get_json_viewmodel().unwrap();
         //TODO: Create a struct for the result, deserialize the result and assert on the struct
         //      This applies to all types of assertions like this.
         assert_eq!(result.data.as_array().unwrap().len(), 2);
+
         assert_line_stat(&result.data, KeyedLineStat{
             key: "js".to_string(),
             stats: LineStats{
-                added: 1,
-                deleted: 2
+                added: 4,
+                deleted: 6
             }
         });
         assert_line_stat(&result.data, KeyedLineStat{
             key: "txt".to_string(),
             stats: LineStats{
-                added: 1,
-                deleted: 6
+                added: 2,
+                deleted: 12
             }
         });
     }

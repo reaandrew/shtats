@@ -45,7 +45,7 @@ function generate_data(language_count){
     for(let i  = 0; i < language_count;i++){
         let extension = make_extension();
         if (returnData.indexOf(extension) === -1) {
-            returnData.push([extension, getRandomIntInclusive(1,500), getRandomIntInclusive(1,500)]);
+            returnData.push([extension, getRandomIntInclusive(1,50000), getRandomIntInclusive(1,500)]);
         }
     }
     return returnData;
