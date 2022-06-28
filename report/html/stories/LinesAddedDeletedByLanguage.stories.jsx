@@ -15,15 +15,20 @@ export default {
 const Template = (args) => <LinesAddedDeletedByLanguage {...args} />;
 
 
-function getRandomIntInclusive(min, max) {
+function random(){
     const crypto = window.crypto || window.msCrypto;
     const randomBuffer = new Uint32Array(1);
 
     crypto.getRandomValues(randomBuffer);
 
     let randomNumber = randomBuffer[0] / (0xffffffff + 1);
+    return randomNumber;
+}
 
-    min = Math.ceil(min);
+function getRandomIntInclusive(min, max) {
+
+    let randomNumber = random();
+        min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(randomNumber * (max - min + 1)) + min;
 }
@@ -33,7 +38,7 @@ function make_extension() {
     var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     var charactersLength = characters.length;
     for ( var i = 0; i < 2; i++ ) {
-        result += characters.charAt(Math.floor(Math.random() *
+        result += characters.charAt(Math.floor(random() *
             charactersLength));
     }
     return result;
