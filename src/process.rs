@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::{ BufReader, Read, Write};
+use std::io::{BufReader, Read, Write};
 use std::path::Path;
 use std::process::{ChildStdout, Command, Stdio};
 use serde_json::{Value};
@@ -46,7 +46,7 @@ impl ProcessGitExecutor {
 
         if read_size != 0 {
             Err(ShtatsError::Regular(ErrorType::ErrExecutingGit))
-        }else{
+        } else {
             Ok(())
         }
     }
@@ -150,7 +150,7 @@ impl Shtats<'_, '_> {
             Box::new(CommitsByFileExtension::default()),
             Box::new(UserSummaryCollector::default()),
             Box::new(LinesByAverageCollector::default()),
-            Box::new(LinesByAverageByFileExtensionCollector::default())
+            Box::new(LinesByAverageByFileExtensionCollector::default()),
         ];
         stats_functions
     }
@@ -186,34 +186,35 @@ fn create_git_log_args(config: &Config) -> Vec<String> {
     args
 }
 
-pub fn get_number_of_commits() -> result::Result<i32>{
+pub fn get_number_of_commits() -> result::Result<i32> {
     let output = Command::new("git")
         .args(["rev-list", "--all", "--count"])
         .output()
         .expect("failed to execute process");
 
-    if !output.status.success(){
+    if !output.status.success() {
         let data = String::from_utf8(output.stderr).unwrap();
 
-        if data.contains("unsafe repository"){
+        if data.contains("unsafe repository") {
             Err(ShtatsError::Regular(ErrorType::ErrUnsafeGitRepository))
-        }else if data.contains("not a git repository") {
+        } else if data.contains("not a git repository") {
             Err(ShtatsError::Regular(ErrorType::ErrNotGitRepository))
-        }else {
+        } else {
             Err(ShtatsError::Regular(ErrorType::ErrExecutingGit))
         }
-    }else {
+    } else {
         Ok(String::from_utf8(output.stdout).unwrap().trim().parse()
             .expect("unexpected output from git revlist --all --count and could not parse."))
     }
 }
 
 #[cfg(test)]
-mod tests{
-    use crate::process::create_git_log_args;
+mod tests {
+    use std::path::Path;
+    use crate::process::{create_git_log_args, get_number_of_commits, ProcessGitExecutor};
 
     #[test]
-    fn test_git_log_args(){
+    fn test_git_log_args() {
         let expected = vec![
             "--no-pager",
             "log",
@@ -229,6 +230,34 @@ mod tests{
 
         assert_eq!(actual, expected);
     }
+
+    /*
+    Start of some basic tests as I am not 100% sure how to setup an example
+    git repo locally and get it to work in CI.  See tests/common for a small
+    set of functions which can be used to setup a git repo locally for testing.
+     */
+
+    #[test]
+    fn test_get_number_of_commits() {
+        let result = get_number_of_commits().unwrap();
+        assert!(result > 0);
+    }
+
+    #[test]
+    fn test_check_status() {
+        let result = ProcessGitExecutor {}.check_status(Path::new("./"));
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_execute_git(){
+        let result = ProcessGitExecutor {}.execute_git(vec![] ,Path::new("./"));
+        assert!(result.is_ok());
+    }
+
+    /*
+    End of not so useful tests
+     */
 }
 
 #[cfg(test)]
