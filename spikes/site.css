@@ -1,0 +1,15 @@
+body {
+    font-family: 'Open Sans', sans-serif;
+}
+h3, h4, h5, h6{
+    font-family: 'Roboto', sans-serif;
+    font-weight: bolder!important;
+}
+h4, h5, h6, li{
+    font-family: 'Roboto', sans-serif;
+    font-weight:normal!important;
+}
+h1, h2{
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+}

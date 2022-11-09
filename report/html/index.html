@@ -29,7 +29,8 @@
     </script>
 </head>
 <body>
-<div id="main" style="height:400px;width:100%;"></div>
+
+<div id="main"></div>
 <script type="module">
     import {h, render} from 'preact';
     import Report from './components/report';
@@ -38,22 +39,25 @@
     import LinesCollection from "./components/lines_collection";
     import Files from "./components/files";
     import UserCollection from "./components/users_collection";
+    import Tabs from "./components/tabs";
 
     console.log('DATA in index', viewmodel.avg_line_stats_by_file_extension)
 
     render(<Report>
-        <Summary data={viewmodel.summary} label={"Summary"}/>
-        <CommitsCollection data={viewmodel.data.total_commits_by_day} punch_data={viewmodel.data.punch_data}
-                           label={"Commits"}/>
-        <LinesCollection data={{
-            total_lines_by_day: viewmodel.data.total_lines_by_day,
-            avg_line_stats: viewmodel.data.avg_line_stats,
-            avg_line_stats_by_file_extension: viewmodel.data.avg_line_stats_by_file_extension
-        }} label={"Lines"}/>
-        <Files data={viewmodel.data.total_files_by_day} file_extension_data={viewmodel.data.files_by_extension}
-               label={"Files"}/>
-        <UserCollection data={viewmodel.data.user_summary_stats} label={"Users"}/>
-    </Report>, document.body);
+        <Tabs>
+            <Summary data={viewmodel.summary} label={"Summary"}/>
+            <CommitsCollection data={viewmodel.data.total_commits_by_day} punch_data={viewmodel.data.punch_data}
+                               label={"Commits"}/>
+            <LinesCollection data={{
+                total_lines_by_day: viewmodel.data.total_lines_by_day,
+                avg_line_stats: viewmodel.data.avg_line_stats,
+                avg_line_stats_by_file_extension: viewmodel.data.avg_line_stats_by_file_extension
+            }} label={"Lines"}/>
+            <Files data={viewmodel.data.total_files_by_day} file_extension_data={viewmodel.data.files_by_extension}
+                   label={"Files"}/>
+            <UserCollection data={viewmodel.data.user_summary_stats} label={"Users"}/>
+        </Tabs>
+    </Report>, document.getElementById('main'));
 </script>
 </body>
 </html>

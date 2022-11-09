@@ -6,7 +6,7 @@ index.html:
 
 .PHONY: debug_build
 debug_build:
-	rm index.html
+	rm index.html || :
 	(cd report/html && \
 			npm install -d && \
 			parcel build --no-optimize index.html && \
